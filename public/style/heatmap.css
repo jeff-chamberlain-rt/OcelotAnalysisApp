@@ -1,0 +1,10 @@
+.hexagon {
+  stroke: #000;
+  stroke-width: 0.5px;
+  opacity: 0.75;
+}
+
+#heatmap {
+	background-image: url(../img/T_Crank.png);
+	color: white;
+}

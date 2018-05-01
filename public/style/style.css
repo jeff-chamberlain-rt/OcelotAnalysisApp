@@ -1,0 +1,25 @@
+#map {
+	background-image: url(../img/T_Crank.png);
+}
+
+button i {
+	vertical-align: middle;
+}
+
+md-whiteframe {
+	background-color: white;
+}
+
+md-whiteframe .md-subheader {
+	background-color: white;
+}
+
+#filterSelect {
+	text-align: center;
+}
+
+.hexagon {
+  stroke: #000;
+  stroke-width: 0.5px;
+  opacity: 0.75;
+}

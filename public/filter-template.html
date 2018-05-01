@@ -1,0 +1,37 @@
+<div flex layout="column">
+	<md-whiteframe class="md-whiteframe-3dp">
+		<div id="filterSelect">
+			<md-menu ng-repeat="(key, value) in filters">
+				<md-button ng-click="$mdMenu.open()">
+					{{key}}<i class="material-icons">arrow_drop_down</i>
+				</md-button>
+				<md-menu-content>
+					<md-menu-item ng-repeat="item in value">
+						<md-button ng-click="switchFilter(key, item)">
+							<i ng-style="{'visibility': filtersInclude(key, item) ? 'visible' : 'hidden'}" class="material-icons">check</i>
+							{{item}}
+						</md-button>
+					</md-menu-item>
+				</md-menu-content>
+			</md-menu>
+		</div>
+		<md-divider ></md-divider>
+		<md-list>
+			<md-subheader class="md-no-sticky">Applied Filters</md-subheader>
+			<md-list-item class="md-2-line" ng-repeat="(key, value) in appliedFilters">
+				<i class="material-icons md-avatar-icon" style="background-color: inherit">filter_list</i>
+				<div class="md-list-item-text">
+					<h3>{{key}}</h3>
+					<p>
+						<span ng-repeat="item in value">
+							<span ng-show="$index > 0">, </span>{{item}}
+						</span>
+					</p>
+				</div>
+			</md-list-item>
+		</md-list>
+		<md-button ng-show="hasFiltersApplied()" ng-click="clearFilters()">
+			<i class="material-icons">clear</i> REMOVE ALL FILTERS
+		</md-button>
+	</md-whiteframe>
+</div>

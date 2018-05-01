@@ -1,0 +1,17 @@
+{
+  "name": "heatmap-generator",
+  "version": "1.0.0",
+  "description": "generates a heatmap using Ocelot data",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rooster Teeth Games",
+  "license": "ISC",
+  "dependencies": {
+    "assert": "^1.4.1",
+    "express": "^4.16.3",
+    "mongodb": "^3.0.7",
+    "path": "^0.12.7"
+  }
+}
