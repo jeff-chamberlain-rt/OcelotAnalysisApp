@@ -38,7 +38,9 @@ app.get('/data', function(req, res) {
 
 app.get('/update', function(req, res) {
   var output = shell.exec('./UpdateDatabase.sh');
-  res.send(output);
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.write(output);
+  res.end();
 });
 
 app.listen(8080);
