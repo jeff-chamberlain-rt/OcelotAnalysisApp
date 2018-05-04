@@ -39,7 +39,7 @@ app.get('/data', function(req, res) {
 app.get('/update', function(req, res) {
   var output = shell.exec('./UpdateDatabase.sh');
   res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.write(output);
+  res.write(output.stdout);
   res.end();
 });
 

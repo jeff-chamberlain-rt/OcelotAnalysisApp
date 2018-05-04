@@ -1,11 +1,6 @@
 time=$(mongo Ocelot --eval 'db.getCollection("analytics").find({}, {"event_timestamp": 1, "_id": 0}).sort({"event_timestamp": -1}).limit(1).shellPrint()' -quiet | jq -r '.event_timestamp')
 echo "latest document: $time"
 local=$(printf "/home/rtgames/OcelotAnalysisApp/data/%s.csv" "$time")
-if [ -e $local ]
-then
-	echo "Data already imported!"
-	exit
-fi
 queryid=$(aws athena start-query-execution --query-execution-context Database=ocelot_analytics_database --query-string "SELECT * FROM ocelot_analytics_stack_us_east_1_telemetry_data WHERE event_timestamp > $time" --result-configuration OutputLocation=s3://aws-athena-query-results-us-east-1-746891288394 | jq -r '.QueryExecutionId|tostring')
 echo "query id: $queryid"
 status="SUBMITTED"
