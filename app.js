@@ -3,6 +3,7 @@ const app = express();
 const path = require('path');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
+const shell = require('shelljs');
 
 // Mongo Connection URL
 const mongoURL = 'mongodb://192.168.1.96:27017';
@@ -33,6 +34,11 @@ app.get('/data', function(req, res) {
       client.close();
     });
   });
+});
+
+app.get('/update', function(req, res) {
+  var output = shell.exec('./UpdateDatabase.sh');
+  res.send(output);
 });
 
 app.listen(8080);
