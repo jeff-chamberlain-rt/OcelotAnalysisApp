@@ -8,3 +8,18 @@
 	background-image: url(../img/T_Crank.png);
 	color: white;
 }
+
+#heatmapControllers {
+	background: white;
+}
+
+#hexColorInput {
+	margin: 18px 0 0 5px;
+    padding: 5px 10px;
+    width: 80px;
+}
+
+#hexSizeInput {
+	margin: 0;
+	padding: 0px 5px 0px 0px;
+}

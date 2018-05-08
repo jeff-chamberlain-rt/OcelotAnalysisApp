@@ -1,0 +1,26 @@
+{
+  "name": "OcelotAnalysisApp",
+  "homepage": "https://github.com/jeff-chamberlain-rt/OcelotAnalysisApp",
+  "authors": [
+    "jeff-chamberlain-rt <jeff.chamberlain@roosterteeth.com>"
+  ],
+  "description": "Generates data visualizations based off Ocelot analytics",
+  "main": "scripts/main.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-animate": "^1.6.10",
+    "angular-messages": "^1.6.10",
+    "angular-aria": "^1.6.10",
+    "d3": "^5.1.0",
+    "angular": "^1.6.10",
+    "angular-material": "^1.1.9",
+    "angular-bootstrap-colorpicker": "^3.0.32"
+  }
+}

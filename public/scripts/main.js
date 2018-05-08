@@ -8,7 +8,7 @@ const filterIgnoreFields = [
 "event_timestamp"
 ];
 
-var app = angular.module( 'OcelotAnalysisApp', [ 'ngMaterial', 'ngMessages' ] )
+var app = angular.module( 'OcelotAnalysisApp', [ 'ngMaterial', 'ngMessages', 'colorpicker.module' ] )
 .config(function($mdThemingProvider){
   $mdThemingProvider.theme('default')
   .primaryPalette('blue')

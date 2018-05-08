@@ -23,8 +23,10 @@ app.directive('heatmap', function( analysisData ) {
       ]
     });
 
-    const hexRadius = 20;
-    const hexColor = "red";
+    const hexRadius = this.hexSize;
+    const hexColor = this.heatmapColor;
+
+    console.log('HEATMAP COLOR', this.heatmapColor);
 
     var hexbin = d3.hexbin()
     .radius(hexRadius)
@@ -49,13 +51,13 @@ app.directive('heatmap', function( analysisData ) {
 
     path.enter()
       .append("path")
-        .attr("d", hexbin.hexagon())
         .style("opacity", 0)
         .attr("fill", "white")
         .attr("transform", function(d) { return "translate(0,0)"; })
       .merge(path)
       .transition()
       .duration(500)
+      .attr("d", hexbin.hexagon())
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
       .style("opacity", 1)
       .attr("fill", function(d) { return color(d.length); })
@@ -64,12 +66,33 @@ app.directive('heatmap', function( analysisData ) {
       .duration(500)
       .style("opacity", 0)
       .remove();
+
+      // Update gradient key
+      d3.select('#gradientEnd').transition()
+        .duration(500)
+        .attr("stop-color", hexColor);
   }
 
   return {
     restrict: 'E',
     scope: {},
     templateUrl: 'heatmap-template.html',
+    controller: ['$scope', function($scope) {
+      $scope.heatmapColor = '#ff0000';
+      $scope.hexSize = 20;
+
+      $scope.$watch(function() {
+        return $scope.heatmapColor
+      }, function() {
+        drawHeatMap.call($scope);
+      });
+
+      $scope.$watch(function() {
+        return $scope.hexSize
+      }, function() {
+        drawHeatMap.call($scope);
+      });
+    }],
     link: function ( scope ) {
       scope.maxValue = 1;
 
@@ -79,7 +102,9 @@ app.directive('heatmap', function( analysisData ) {
 
       scope.$watch(function() {
         return analysisData.getFilters()
-      }, drawHeatMap.bind(scope), true)
+      }, drawHeatMap.bind(scope), true);
+
+      //scope.$watch(scope.heatmapColor, drawHeatMap.bind(scope), true);
     }
   }
 });

@@ -1,17 +1,34 @@
-<svg id="heatmap" width="864" height="900">
-	<g>
-		<clipPath id="clip">
-			<rect width="864" height="900"></rect>
-		</clipPath>
-		<g class="hexagon" clip-path="url(#clip)"></g>
-		<rect width="864" height="30" style="fill: url(#linearGradient)"></rect>
-		<text x="5" y="50" text-anchor="start" fill="white">0</text>
-		<text  x="859" y="50" text-anchor="end" fill="white">{{maxValue}}</text>
-		<defs>
-			<linearGradient x1="0%" y1="0%" x2="100%" y2="0%" id="linearGradient">
-				<stop offset="0%" stop-color="white"></stop>
-				<stop offset="100%" stop-color="red"></stop>
-			</linearGradient>
-		</defs>
-	</g>
-</svg>
+<div>
+	<div id="heatmapControllers" layout="row">
+		<md-input-container id="hexColorInput">
+			<label>Hex Color</label>
+			<input colorpicker type="text" ng-model="heatmapColor" />
+		</md-input-container>
+		<md-slider-container id="hexSizeInput" flex layout>
+			<div flex="10" layout layout-align="center center">
+				<span class="md-body-1">Hex Size</span>
+			</div>
+			<md-slider ng-model="hexSize" md-discrete flex min="1" step="1" max="100"></md-slider>
+			<md-input-container>
+				<input type="number" ng-model="hexSize">
+			</md-input-container>
+		</md-slider-container>
+	</div>
+	<svg id="heatmap" width="864" height="900">
+		<g>
+			<clipPath id="clip">
+				<rect width="864" height="900"></rect>
+			</clipPath>
+			<g class="hexagon" clip-path="url(#clip)"></g>
+			<rect width="864" height="30" style="fill: url(#linearGradient)"></rect>
+			<text x="5" y="50" text-anchor="start" fill="white">0</text>
+			<text  x="859" y="50" text-anchor="end" fill="white">{{maxValue}}</text>
+			<defs>
+				<linearGradient x1="0%" y1="0%" x2="100%" y2="0%" id="linearGradient">
+					<stop offset="0%" stop-color="white"></stop>
+					<stop id="gradientEnd" offset="100%" stop-color="white"></stop>
+				</linearGradient>
+			</defs>
+		</g>
+	</svg>
+</div>
