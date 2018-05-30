@@ -1,3 +1,4 @@
+#!/bin/bash
 time=$(mongo Ocelot --eval 'db.getCollection("analytics").find({}, {"event_timestamp": 1, "_id": 0}).sort({"event_timestamp": -1}).limit(1).shellPrint()' -quiet | jq -r '.event_timestamp')
 echo "latest document: $time"
 local=$(printf "/home/rtgames/OcelotAnalysisApp/data/%s.csv" "$time")

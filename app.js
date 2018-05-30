@@ -1,3 +1,5 @@
+#!/usr/bin/env nodejs
+
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -6,7 +8,7 @@ const assert = require('assert');
 const shell = require('shelljs');
 
 // Mongo Connection URL
-const mongoURL = 'mongodb://192.168.1.96:27017';
+const mongoURL = 'mongodb://ocelotReadOnly:ocelot@192.168.1.96:27017/?authMechanism=SCRAM-SHA-1&authSource=Ocelot';
 
 // Database Name
 const dbName = 'Ocelot';
