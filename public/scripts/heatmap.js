@@ -1,8 +1,8 @@
 app.directive('heatmap', function( analysisData ) {
-  const worldCenterX = -100.0,
-  worldCenterY = -3275.0,
-  worldSizeX = 22950.0,
-  worldSizeY = 23760.0;
+const worldCenterX = -225.0,
+	worldCenterY = -2150.0,
+	worldSizeX = 24625.0,
+	worldSizeY = 26055.0;
 
   function drawHeatMap () {
     var svg = d3.select("svg"),

@@ -5,7 +5,9 @@ const filterIgnoreFields = [
 "location_z",
 "round_seconds",
 "event_id",
-"event_timestamp"
+"event_timestamp",
+"match_id",
+"round_id"
 ];
 
 var app = angular.module( 'OcelotAnalysisApp', [ 'ngMaterial', 'ngMessages', 'colorpicker.module' ] )
@@ -40,10 +42,11 @@ var app = angular.module( 'OcelotAnalysisApp', [ 'ngMaterial', 'ngMessages', 'co
     var fields = Object.keys(data[0]);
     fields.forEach(function(key) {
       // expicitly ignore fields we don't want to filter by (there's probably a better way to do this)
-      if ( !filterIgnoreFields.includes(key) )
+		if ( !filterIgnoreFields.includes(key) )
       {
         filters[key] = [];
-      }
+      }  
+	  
     });
 
     // create object listing all possible filters
@@ -169,6 +172,7 @@ var app = angular.module( 'OcelotAnalysisApp', [ 'ngMaterial', 'ngMessages', 'co
     'hasFiltersApplied': hasFiltersApplied
   }
 })
+
 .controller ("OcelotAnalysisController", function ($scope, $http, analysisData) {
   function initData() {
     $http.get('/data').then(function(response) {

@@ -1,5 +1,7 @@
 #!/usr/bin/env nodejs
 
+console.log("Begin connection...");
+
 const express = require('express');
 const app = express();
 const path = require('path');

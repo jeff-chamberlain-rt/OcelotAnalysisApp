@@ -1,0 +1,83 @@
+<html>
+<head>
+	<!-- default is 864x900 --->
+	<img id="Crank" width="864" height="900" src="../img/T_Crank.png" class="hide">
+	<link rel="stylesheet" type="text/css" href="style/style.css">
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic">
+	<link rel="stylesheet" href="/bower_components/angular-material/angular-material.css">
+	<link rel="stylesheet" href="/bower_components/angular-bootstrap-colorpicker/css/colorpicker.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+	rel="stylesheet">
+</head>
+<body ng-app="OcelotAnalysisApp">
+	<div  ng-controller="OcelotAnalysisController1">
+	
+		<p> Select a Version </p>
+		<select ng-model="selectedVer" ng-options="x for x in vers">
+		</select>
+		<h1> Display data from: {{selectedVer}}</h1>
+
+		
+		<button ng-click="myFunc1()">Toggle Version</button>
+		<button ng-click="RefreshFunc()">Refresh </button>
+		<div ng-show="showMe1">
+			
+			<p> Select a Match {{selectedMatch}}</p>
+			<select ng-model="selectedMatch" ng-options="x for x in matches">
+			</select>
+			<br>			
+			
+			<p> Select a Round {{selectedRound}}</p>
+			<select ng-model="selectedRound" ng-options="x for x in rounds">
+			</select>
+			<br>
+			
+			<button ng-click="update_players()">Toggle Round/Match</button>
+			
+			
+			<div ng-show="showPlayers">
+				<p> Select Humans ( hold cntrl ;d )</p>
+				<select multiple ng-model="selectedHumans" ng-options="x for x in humans">
+				</select>
+				<br>
+			
+			
+				<p> Select Aliens ( hold cntrl ;d )</p>
+				<select multiple ng-model="selectedAliens" ng-options="x for x in aliens">
+				</select>
+				<br>
+				
+				<p> View Players:</p>
+				<p> Selected Humans: {{selectedHumans}} </p>
+				<p> Selectd Aliens: {{selectedAliens}}
+			
+				<button ng-click="myFunc2()">Toggle Selected Players</button>
+				<div ng-show="showMe2">
+					<h2> Player's Travel </h2>
+					<!-- default is 864x900 --->
+					<canvas id="mapCanvas" width="864" height="900"></canvas>
+					<br>
+					<h2> Round Summaries: </h2>
+					<p> Aliens win? {{Rnd_result}} </p>
+					<p> Number of Survivors? {{rnd_survivors}} </p>
+					<p> First Alien Kill time? {{rnd_falkt}} seconds</p>
+					
+				</div>
+			
+			</div>
+		</div>
+	</div>
+	
+	
+	<script src="/bower_components/angular/angular.js"></script>
+	<script src="/bower_components/angular-aria/angular-aria.js"></script>
+	<script src="/bower_components/angular-animate/angular-animate.js"></script>
+	<script src="/bower_components/angular-messages/angular-messages.js"></script>
+	<script src="/bower_components/angular-material/angular-material.js"></script>
+	<script src="/bower_components/angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.js"></script>
+	<script src="/bower_components/d3/d3.js"></script>
+	<script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
+	<script src="/scripts/Travel_helpers.js"></script>
+	<script src="/scripts/travel.js"></script>
+</body>
+</html>
