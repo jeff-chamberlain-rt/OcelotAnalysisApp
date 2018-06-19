@@ -40,10 +40,11 @@ var app = angular.module( 'OcelotAnalysisApp', [ 'ngMaterial', 'ngMessages', 'co
     var fields = Object.keys(data[0]);
     fields.forEach(function(key) {
       // expicitly ignore fields we don't want to filter by (there's probably a better way to do this)
-      if ( !filterIgnoreFields.includes(key) )
+		if ( !filterIgnoreFields.includes(key) )
       {
         filters[key] = [];
-      }
+      }  
+	  
     });
 
     // create object listing all possible filters
@@ -169,6 +170,7 @@ var app = angular.module( 'OcelotAnalysisApp', [ 'ngMaterial', 'ngMessages', 'co
     'hasFiltersApplied': hasFiltersApplied
   }
 })
+
 .controller ("OcelotAnalysisController", function ($scope, $http, analysisData) {
   function initData() {
     $http.get('/data').then(function(response) {
