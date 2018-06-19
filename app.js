@@ -21,8 +21,12 @@ const collName = 'analytics';
 app.use(express.static('public'))
 
 // viewed at http://localhost:8080
-app.get('/', function(req, res) {
+app.get('/heatmap', function(req, res) {
     res.sendFile(path.join(__dirname + '/public/heatmap.html'));
+});
+
+app.get('/travel', function(req, res) {
+    res.sendFile(path.join(__dirname + '/public/Travel.html'));
 });
 
 app.get('/data', function(req, res) {
