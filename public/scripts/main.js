@@ -6,8 +6,6 @@ const filterIgnoreFields = [
 "round_seconds",
 "event_id",
 "event_timestamp",
-"match_id",
-"round_id"
 ];
 
 var app = angular.module( 'OcelotAnalysisApp', [ 'ngMaterial', 'ngMessages', 'colorpicker.module' ] )

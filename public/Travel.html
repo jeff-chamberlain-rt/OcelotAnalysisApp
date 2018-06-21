@@ -22,8 +22,8 @@
 		<button ng-click="RefreshFunc()">Refresh </button>
 		<div ng-show="showMe1">
 			
-			<p> Select a Match {{selectedMatch}}</p>
-			<select ng-model="selectedMatch" ng-options="x for x in matches">
+			<p> Select a Match Date, Selected ID:{{selectedMatch.m_Id}}</p>
+			<select ng-model="selectedMatch" ng-options="x.m_date for x in matches",value="x.m_Id">
 			</select>
 			<br>			
 			
@@ -54,13 +54,31 @@
 				<button ng-click="myFunc2()">Toggle Selected Players</button>
 				<div ng-show="showMe2">
 					<h2> Player's Travel </h2>
-					<!-- default is 864x900 --->
+					
 					<canvas id="mapCanvas" width="864" height="900"></canvas>
 					<br>
 					<h2> Round Summaries: </h2>
-					<p> Aliens win? {{Rnd_result}} </p>
+					<p> Round Length {{Rnd_length}} </p>
+					<p> Elimination victory? {{Rnd_result}} </p>
 					<p> Number of Survivors? {{rnd_survivors}} </p>
-					<p> First Alien Kill time? {{rnd_falkt}} seconds</p>
+					<p> Alien Deaths: ({{Tot_deaths}} Total Deaths)</p>
+					<table>
+						<tr ng-repeat="x in Alien_Data">
+							<td>{{ x.secs }}</td>
+							<td>{{ x.a_type }}</td>
+							<td>{{ x.player }}</td>
+						</tr>
+					</table>
+					<p> Command Point Sumamry </p>
+					<table>
+						<th>Point #</th>
+						<th>Activation Time</th>
+						<th>Capture Time</th>
+						<tr ng-repeat="x in cmd_Info">
+							<td>{{ $index + 1 }}</td>
+							<td>{{x.activation}}</td>
+							<td>{{x.capture}}</td>		
+						</tr>
 					
 				</div>
 			
