@@ -2,7 +2,7 @@
 <head>
 	<!-- default is 864x900 --->
 	<img id="Crank" width="864" height="900" src="../img/T_Crank.png" class="hide">
-	<link rel="stylesheet" type="text/css" href="style/style.css">
+	<link rel="stylesheet" type="text/css" href="style/travel.css">
 	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic">
 	<link rel="stylesheet" href="/bower_components/angular-material/angular-material.css">
 	<link rel="stylesheet" href="/bower_components/angular-bootstrap-colorpicker/css/colorpicker.css">
@@ -18,9 +18,9 @@
 		<h1> Display data from: {{selectedVer}}</h1>
 
 		
-		<button ng-click="myFunc1()">Toggle Version</button>
+		<button ng-click="confirmVersion()">Confirm Version</button>
 		<button ng-click="RefreshFunc()">Refresh </button>
-		<div ng-show="showMe1">
+		<div ng-show="showMatchesAndRounds">
 			
 			<p> Select a Match Date, Selected ID:{{selectedMatch.m_Id}}</p>
 			<select ng-model="selectedMatch" ng-options="x.m_date for x in matches",value="x.m_Id">
@@ -32,7 +32,7 @@
 			</select>
 			<br>
 			
-			<button ng-click="update_players()">Toggle Round/Match</button>
+			<button ng-click="confirmRoundAndMatch()">Confirm Round/Match</button>
 			
 			
 			<div ng-show="showPlayers">
@@ -51,25 +51,30 @@
 				<p> Selected Humans: {{selectedHumans}} </p>
 				<p> Selectd Aliens: {{selectedAliens}}
 			
-				<button ng-click="myFunc2()">Toggle Selected Players</button>
-				<div ng-show="showMe2">
+				<button ng-click="getTravelData()">Confirm Selected Players</button>
+				<div ng-show="showTravelData">
 					<h2> Player's Travel </h2>
 					
 					<canvas id="mapCanvas" width="864" height="900"></canvas>
 					<br>
 					<h2> Round Summaries: </h2>
 					<p> Round Length {{Rnd_length}} </p>
-					<p> Elimination victory? {{Rnd_result}} </p>
+					<p> Overtime? {{Overtime}} </p>
+					<p> Time Expired? {{Time_Expire}} </p>
+					<p> Which Team Won? {{Winning_Team}} </p>
 					<p> Number of Survivors? {{rnd_survivors}} </p>
 					<p> Alien Deaths: ({{Tot_deaths}} Total Deaths)</p>
 					<table>
+						<th>Time of Death</th>
+						<th>Player Name</th>
+						<th>Alien Type</th>
 						<tr ng-repeat="x in Alien_Data">
 							<td>{{ x.secs }}</td>
 							<td>{{ x.a_type }}</td>
 							<td>{{ x.player }}</td>
 						</tr>
 					</table>
-					<p> Command Point Sumamry </p>
+					<p> Command Point Summary </p>
 					<table>
 						<th>Point #</th>
 						<th>Activation Time</th>
@@ -79,7 +84,20 @@
 							<td>{{x.activation}}</td>
 							<td>{{x.capture}}</td>		
 						</tr>
-					
+					</table>
+					<p> Weapon Summary </p>
+					<table>
+						<th>Weapon Name</th>
+						<th>Average Damage</th>
+						<th>Total Damage</th>
+						<th>Number of hits</th>
+						<tr ng-repeat="x in Weapon_Data">
+							<td>{{x.weapon_name}}</td>
+							<td>{{x.average_damage}}</td>
+							<td>{{x.total_damage}}</td>
+							<td>{{x.num_records}}</td>	
+						</tr>
+					</table>
 				</div>
 			
 			</div>
@@ -97,5 +115,6 @@
 	<script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
 	<script src="/scripts/Travel_helpers.js"></script>
 	<script src="/scripts/travel.js"></script>
+	
 </body>
 </html>
