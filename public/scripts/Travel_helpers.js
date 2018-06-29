@@ -223,7 +223,17 @@ function get_player_travel( data, name, team, rnd, match ) {
 	HB_data = data_Find( trim_data, [ 'event_type', 'player_heartbeat' ] );
 	var travel_points = getPoints( HB_data, 'TRAVEL' );
 	
-return [ travel_points, death_points ];
+	
+	//get location of spawn
+	spawn_data = data_Find( trim_data, ['event_type','player_teleport']);
+	var spawn_points = getPoints( spawn_data, 'SPWN' );
+	
+	//get location/time of evacs
+	evac_data = data_Find( trim_data, ['event_type','player_evac']);
+	var evac_points = getPoints( evac_data, 'EVAC' );
+	
+	
+return [ travel_points, death_points , spawn_points, evac_points];
 
 }
 function get_cmd_points( data ) {
