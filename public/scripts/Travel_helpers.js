@@ -279,12 +279,12 @@ function get_rnd_Sums( data ) {
 	rnd_end_sums = data_Find( data, [ 'event_type', 'round_end' ] )[ 0 ];
 
 	//Find all alien deaths 
-	//filter only player deaths
-	death_data = data_Find( data, [ 'event_type', 'player_death' ] );
-		
-	//filter only Alien deaths
-	trim_data = data_Find( death_data, [ 'player_team', 'Alien' ] );
+	//filter only Alien team
+	trim_data = data_Find( data, [ 'player_team', 'Alien' ] );
 	
+	//filter only player deaths
+	death_data = data_Find( trim_data, [ 'event_type', 'player_death' ] );
+
 	a_data = death_data.map( a => [ a.round_seconds, a.player_name, a.actor_class ] );
 	Alien_data = [ ];
 	a_data.forEach( function( death ) {
