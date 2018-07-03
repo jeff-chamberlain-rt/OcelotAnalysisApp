@@ -77,9 +77,12 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 				//Function variables
 				////////////////////
 				var skip=0; 
-				var pathing = mapPoints( player_paths, img.width, img.height );
+				var pathing = mapPoints( player_paths[0], img.width, img.height );
 				var i;
 				var death = false;
+				var spawnSec = Time_In_Start;
+				var evacSec = 1000;
+				
 				
 				if(pathing === undefined || pathing.length == 0) {
 					console.log( "player has no paths..." );
@@ -96,11 +99,36 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 					ctx.fillStyle= colorwheel2[ count ];
 				}
 				
-				//start one heartbeat (5sec intervals) after start
-				for ( i = ( Time_In_Start / 5 + 1 ); i < pathing.length; i++ ) {
+				//plot spawn point
+				var spwnPnt = mapPoints( player_paths[ 1 ], img.width, img.height )[ 0 ];
+				if( spwnPnt != undefined && spwnPnt[ 1 ] != undefined){
+					ctx.font = "50px Arial";
+					ctx.fillText( "S", spwnPnt[ 1 ].x, spwnPnt[ 1 ].y );
+					spawnSec = spwnPnt[0];
+				}
+				
+				//plot evac and get time of evac 
+				var evacPnt = mapPoints( player_paths[ 2 ], img.width, img.height )[ 0 ];
+				if( evacPnt != undefined && evacPnt[ 1 ] != undefined){
+					ctx.font = "50px Arial";
+					ctx.fillText( "E", evacPnt[ 1 ].x, evacPnt[ 1 ].y );
+					evacSec = evacPnt[0];
+				}
+				
+				
+				//Start and end realtive to the spawn and evac
+				for ( i = 1; i < pathing.length; i++ ) {
 					var t = pathing[ i-1 ][ 0 ];
 					var p = pathing[ i ][ 1 ];
 					var secs = pathing[ i ][ 0 ];
+					
+					
+					if( pathing[ i - 1 ][ 0 ] < spawnSec ){
+						continue;
+					}
+					if( secs > evacSec){
+						break;
+					}
 					
 					//if sprinting needs dashed if not start at default
 					if( pathing[ i ][ 2 ] == "true" ) {
@@ -211,7 +239,7 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 			//For each of the selected humans
 			$scope.selectedHumans.forEach( function ( player ) {
 				res = get_player_travel( game_data, player, "Human", $scope.selectedRound, $scope.selectedMatch.m_Id );
-				player_paths = res[ 0 ];
+				player_paths = [ res[ 0 ], res[ 2 ], res[ 3 ] ];
 				death_points = res[ 1 ];
 				death_secs = plotDeath( death_points, drawer[ 0 ], drawer[ 1 ], count, "Human" );
 				drawTravels( player_paths, drawer[ 0 ], drawer[ 1 ], count, player, "Human",  death_secs );
@@ -223,7 +251,7 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 			count = 0;
 			$scope.selectedAliens.forEach( function ( player ) {
 				res = get_player_travel( game_data, player, "Alien", $scope.selectedRound, $scope.selectedMatch.m_Id );
-				player_paths = res[ 0 ];
+				player_paths = [ res[ 0 ], res[ 2 ] ]
 				death_points = res[ 1 ];
 				death_secs = plotDeath( death_points, drawer[ 0 ], drawer[ 1 ], count, "Alien" );
 				drawTravels( player_paths, drawer[ 0 ], drawer[ 1 ], count, player, "Alien", death_secs );
@@ -243,15 +271,19 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 			//Get round summaries
 			//Defaults in case of read error			
 			$scope.Rnd_length = "N/A";
-			$scope.Rnd_result = "N/A";
+			$scope.Winning_Team = "N/A";
 			$scope.rnd_survivors = "N/A";
+			$scope.Time_Expire = "N/A";
+			$scope.Overtime = "N/A";
 			$scope.Alien_Data = [ ];
 			res = get_rnd_Sums( game_data );
 			
 			//End of Round Data
 			if( res[ 0 ] != undefined ) {
 				console.log(res[0]);
-				$scope.Rnd_result = res[ 0 ].elimination_victory;
+				$scope.Overtime = res[0].timer_expired;
+				$scope.Time_Expire = res[0].timer_expired;
+				$scope.Winning_Team = res[ 0 ].winning_team;
 				$scope.rnd_survivors = res[ 0 ].surviving_humans;
 				$scope.Rnd_length = res[ 0 ].round_seconds;
 			}

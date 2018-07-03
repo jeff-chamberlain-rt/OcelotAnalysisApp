@@ -223,7 +223,17 @@ function get_player_travel( data, name, team, rnd, match ) {
 	HB_data = data_Find( trim_data, [ 'event_type', 'player_heartbeat' ] );
 	var travel_points = getPoints( HB_data, 'TRAVEL' );
 	
-return [ travel_points, death_points ];
+	
+	//get location of spawn
+	spawn_data = data_Find( trim_data, ['event_type','player_teleport']);
+	var spawn_points = getPoints( spawn_data, 'SPWN' );
+	
+	//get location/time of evacs
+	evac_data = data_Find( trim_data, ['event_type','player_evac']);
+	var evac_points = getPoints( evac_data, 'EVAC' );
+	
+	
+return [ travel_points, death_points , spawn_points, evac_points];
 
 }
 function get_cmd_points( data ) {
@@ -269,12 +279,12 @@ function get_rnd_Sums( data ) {
 	rnd_end_sums = data_Find( data, [ 'event_type', 'round_end' ] )[ 0 ];
 
 	//Find all alien deaths 
-	//filter only player deaths
-	death_data = data_Find( data, [ 'event_type', 'player_death' ] );
-		
-	//filter only Alien deaths
-	trim_data = data_Find( death_data, [ 'player_team', 'Alien' ] );
+	//filter only Alien team
+	trim_data = data_Find( data, [ 'player_team', 'Alien' ] );
 	
+	//filter only player deaths
+	death_data = data_Find( trim_data, [ 'event_type', 'player_death' ] );
+
 	a_data = death_data.map( a => [ a.round_seconds, a.player_name, a.actor_class ] );
 	Alien_data = [ ];
 	a_data.forEach( function( death ) {

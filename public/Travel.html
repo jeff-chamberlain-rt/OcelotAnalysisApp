@@ -59,13 +59,15 @@
 					<br>
 					<h2> Round Summaries: </h2>
 					<p> Round Length {{Rnd_length}} </p>
-					<p> Elimination victory? {{Rnd_result}} </p>
+					<p> Overtime? {{Overtime}} </p>
+					<p> Time Expired? {{Time_Expire}} </p>
+					<p> Which Team Won? {{Winning_Team}} </p>
 					<p> Number of Survivors? {{rnd_survivors}} </p>
 					<p> Alien Deaths: ({{Tot_deaths}} Total Deaths)</p>
 					<table>
 						<th>Time of Death</th>
-						<th>Player Name</th>
 						<th>Alien Type</th>
+						<th>Player Name</th>
 						<tr ng-repeat="x in Alien_Data">
 							<td>{{ x.secs }}</td>
 							<td>{{ x.a_type }}</td>
