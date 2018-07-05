@@ -70,6 +70,7 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 		if( res[0] != undefined ) {
 			$scope.Match_Weapon_Data = res[ 0 ];
 		}
+		//Rounds overview table
 		if( res[1] != undefined ){
 			$scope.Match_Data = res[ 1 ];
 		}

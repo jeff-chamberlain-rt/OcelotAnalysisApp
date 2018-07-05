@@ -60,9 +60,10 @@ function Weapon_Info( name, avg_dam, tot_dam, records ) {
 	this.num_records = records;
 }
 
-function Round_Summary( rnd_num, rnd_id, overtime, winners, survivors, roundlength, humanDeathCnt, alienDeathCnt ) {
+function Round_Summary( rnd_num, rnd_id, overtime, expired, winners, survivors, roundlength, humanDeathCnt, alienDeathCnt ) {
 	this.round_number = rnd_num;
 	this.round_id = rnd_id;
+	this.expired = expired;
 	this.overtime = overtime;
 	this.winningTeam = winners;
 	this.survivors = survivors;
@@ -91,27 +92,24 @@ function getAllIndexes( arr, val ) {
 };
 
 //This will be similar to mongos find
+//Can be deleted... here for simplicity in function call
 function data_Find( data, search_arg ) {
 	var all_data = data;
 	var data_var = search_arg[ 0 ];
 	var compare_to = search_arg[ 1 ];
-
+	var found_data = [ ];
+	
 	// here we will filter by each possible field based on which data var we get
 	//we will only include things we will often search by...
 	switch ( data_var ) {
-		case 'app_version': var temp = all_data.map( a=>a.app_version ); break;
-		case 'event_type': var temp = all_data.map( a=>a.event_type ); break;	
-		case 'player_team': var temp = all_data.map( a=>a.player_team ); break;	
-		case 'player_name': var temp = all_data.map( a=>a.player_name ); break;
-		case 'match_id': var temp = all_data.map( a=>a.match_id ); break;		
-		case 'round_id': var temp = all_data.map( a=>a.round_id ); break;	
+		case 'app_version': found_data = all_data.filter(d => d.app_version == compare_to); break;
+		case 'event_type': found_data = all_data.filter(d => d.event_type == compare_to); break;	
+		case 'player_team': found_data = all_data.filter(d => d.player_team == compare_to); break;	
+		case 'player_name': found_data = all_data.filter(d => d.player_name == compare_to); break;
+		case 'match_id': found_data = all_data.filter(d => d.match_id == compare_to); break;		
+		case 'round_id': found_data = all_data.filter(d => d.round_id == compare_to); break;	
 		default: console.log( "Error, What are you searching for?" );
 	}
-	if( temp === undefined ) {
-		return [ ];
-	}
-	trim_ndxs = getAllIndexes( temp, compare_to );
-	var found_data = trim_ndxs.map( i => all_data[ i ] );
 	return found_data;
 }
 
@@ -391,13 +389,13 @@ function getMatchSums( data, selectedMatch ) {
 		if( roundSummarys.length > 0 ){
 			roundSummary = roundSummarys[0];
 			matchSummary.push( new Round_Summary( roundSummary.round_number, roundSummary.round_id,
-				roundSummary.timer_expired, roundSummary.winning_team, 
+				roundSummary.in_overtime, roundSummary.timer_expired, roundSummary.winning_team, 
 				roundSummary.surviving_humans, roundSummary.round_seconds, 
 				humanDeathCnt, alienDeathCnt ) );
 		}
 	});
 	
-	return [ weapons, matchSummary ];
+	return [ weapons, matchSummary.sort(function(a,b){a.round_number - b.round_number}) ];
 }
 
 function setMapPoints( map_name ){
@@ -422,7 +420,6 @@ function setMapPoints( map_name ){
 }
 
 function mapPoints( travel_points, imgWidth, imgHeight ) {
-	console.log('CenX:',worldCenterX,'CenY:',worldCenterY,'SizeX:',worldSizeX,'SizeY:',worldSizeY);
 	pathing = [ ];
 	travel_points.forEach( function ( p ) {
 			p[ 1 ].x = ( ( p[ 1 ].x - worldCenterX) / worldSizeX ) * imgWidth + ( imgWidth / 2 );

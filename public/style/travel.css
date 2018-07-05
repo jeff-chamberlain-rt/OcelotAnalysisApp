@@ -72,3 +72,6 @@ table tr:nth-child(odd) {
 table tr:nth-child(even) {
   background-color: #ffffff;
 }
+span.PickPlayers {
+    display: inline-block; 
+}
