@@ -23,12 +23,12 @@
 		<button ng-click="RefreshFunc()">Refresh </button>
 		<div ng-show="showMatchesAndRounds">
 			
-			<p> Select a Match Date, Selected ID:{{selectedMatch.m_Id}}</p>
+			<p> Select a Match Date, Selected ID: {{selectedMatch.m_Id}}</p>
 			<select ng-model="selectedMatch" ng-options="x.m_date for x in matches",value="x.m_Id">
 			</select>
 			<br>			
 			<button ng-click="confirmMatch()">ConfirmMatch</button>
-			
+
 			<div ng-show="ShowMatchData">
 				<p> Match Weapon Summary </p>
 				<table>
@@ -50,6 +50,7 @@
 					<th>Winning Team </th>
 					<th>Human Survivors </th>
 					<th>Overtime? </th>
+					<th>Timer Expired? </th>
 					<th>Round Length </th>
 					<th>Human Deaths </th>
 					<th>Alien Deaths </th>
@@ -59,6 +60,7 @@
 						<td> {{x.winningTeam}} </td>
 						<td> {{x.survivors}} </td>
 						<td> {{x.overtime}} </td>
+						<td> {{x.expired}} </td>
 						<td> {{x.roundlength}} </td>
 						<td> {{x.humanDeaths}} </td>
 						<td> {{x.alienDeaths}} </td>
@@ -66,7 +68,7 @@
 				</table>
 			</div>
 			
-			<p> Select a Round {{selectedRound.round_id}}</p>
+			<p> Select a Round, Selected ID: {{selectedRound.round_id}}</p>
 			<select ng-model="selectedRound" ng-options="x.round_number for x in rounds", value="x.round_id">
 			</select>
 			<br>
@@ -75,21 +77,23 @@
 			
 			
 			<div ng-show="showPlayers">
-				<p> Select Humans </p>
-				<select multiple ng-model="selectedHumans" ng-options="x for x in humans">
-				</select>
-				<br>
-			
-			
-				<p> Select Aliens </p>
-				<select multiple ng-model="selectedAliens" ng-options="x for x in aliens">
-				</select>
-				<br>
+				<span class = "PickPlayers">
+					<p> Select Humans: </p>
+					<select multiple ng-model="selectedHumans" ng-options="x for x in humans">
+					</select>
+					<br>
+				</span>
+				<span class = "PickPlayers">
+					<p> Select Aliens: </p>
+					<select multiple ng-model="selectedAliens" ng-options="x for x in aliens">
+					</select>
+					<br>
+				</span>
 				
 				<p> View Players:</p>
 				<p> Selected Humans: {{selectedHumans}} </p>
 				<p> Selected Aliens: {{selectedAliens}}
-			
+				<br>
 				<button ng-click="getTravelData()">Confirm Selected Players</button>
 				<div ng-show="showTravelData">
 					<h2> Player's Travel </h2>
