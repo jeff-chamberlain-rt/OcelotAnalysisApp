@@ -19,12 +19,14 @@ const colorwheel1 = ['#009999','#33ccff','#0000ff','#ff6600','#ff99ff','#cc00cc'
 
 //Not permentant
 const colorwheel2 = ['#ff9900','#ff3300','#cc0000','#ffcc66','#ff0066','#cc3300'];
-	
-const worldCenterX = -225.0,
-	worldCenterY = -2150.0,
-	worldSizeX = 24625.0,
-	worldSizeY = 26055.0;
 
+//default world sizes...
+var worldCenterX = 0;
+var	worldCenterY = 0;
+var	worldSizeX = 25000.0;
+var	worldSizeY = 25000.0;
+	
+	
 //Protypes
 /////////
 function Point( x, y, z ) {
@@ -58,9 +60,27 @@ function Weapon_Info( name, avg_dam, tot_dam, records ) {
 	this.num_records = records;
 }
 
+function Round_Summary( rnd_num, rnd_id, overtime, winners, survivors, roundlength, humanDeathCnt, alienDeathCnt ) {
+	this.round_number = rnd_num;
+	this.round_id = rnd_id;
+	this.overtime = overtime;
+	this.winningTeam = winners;
+	this.survivors = survivors;
+	this.roundlength = roundlength;
+	this.humanDeaths = humanDeathCnt;
+	this.alienDeaths = alienDeathCnt;
+}
 //Frequent Functions
 ////////////////////
 //To be used in the next function
+function remove(array, element) {
+    const index = array.indexOf(element);
+    
+    if (index !== -1) {
+        array.splice(index, 1);
+    }
+}
+
 function getAllIndexes( arr, val ) {
     var indexes = [ ], i;
     for( i = 0; i < arr.length; i++ ) {
@@ -111,6 +131,7 @@ function data_Distinct( data, search_arg ) {
 		case 'match_id': var temp = all_data.map( a => a.match_id ); break;	
 		case 'round_id': var temp = all_data.map( a => a.round_id ); break;
 		case 'round_number': var temp = all_data.map( a => a.round_number ); break;
+		case 'event_type': var temp = all_data.map( a => a.event_type ); break;
 		default: console.log( "Error, What are you searching for?" );
 	}
 	if( temp === undefined ) {
@@ -169,30 +190,20 @@ function get_distinct_matches( data ) {
 	return returnedMatches;
 }
 
-function get_distinct_rounds( data ) {
-	unsorted_rnds = data_Distinct( data, 'round_number' );
-	return unsorted_rnds.sort( function( a, b ){ return a - b } );
+function get_distinct_rounds( data , selectedMatchId) {
+	//trim for that match
+	var trim_data = data_Find( data, ['match_id', selectedMatchId ] );
+	unsorted_rnds = data_Find( trim_data, [ 'event_type', 'round_begin' ] );
+	return unsorted_rnds.sort( function( a, b ){ return a.round_number - b.round_number } );
 }
 
-function get_Rnd_Data( data, rnd, match) {
+function get_Rnd_Data( data, rndId, matchId) {
 	//trim data for only that match:
-	trim_data = data_Find( data, [ 'match_id' ,match ] );
+	var game_data = data_Find( data, [ 'match_id' ,matchId ] );
 	
-	//Find round ID of that round
-	for ( let evnt of trim_data ) {
-		if ( evnt.event_type == "round_begin" ) {
-			if( evnt.round_number == rnd ) {
-				rnd_id = evnt.round_id;
-				break;
-			}
-		}
-	}
-	if( rnd_id === undefined ) {
-		console.log( "Error, roundID not found for that match" );
-		return [ ];
-	}
-	trim_data = data_Find( trim_data, [ 'round_id', rnd_id ] );
-	return trim_data;
+	//trim data for that round id	
+	
+	return data_Find( game_data, [ 'round_id', rndId ] );
 }
 
 function get_distinct_players( data ) {
@@ -202,7 +213,7 @@ function get_distinct_players( data ) {
 	alien_players = data_Distinct( aliens, 'player_name' );
 	return [ human_players, alien_players ];
 }
-function get_player_travel( data, name, team, rnd, match ) {
+function get_player_travel( data, name, team) {
 	//trim data for only that player:
 	trim_data = data_Find( data, [ 'player_name', name] );
 	
@@ -272,37 +283,18 @@ function get_cmd_points( data ) {
 	return cmd_points;
 }
 
-function get_rnd_Sums( data ) {
-
-	//get the round end event type for most of the summaries 
-	//( [0] because we want only object of array of objects)	
-	rnd_end_sums = data_Find( data, [ 'event_type', 'round_end' ] )[ 0 ];
-
-	//Find all alien deaths 
-	//filter only Alien team
-	trim_data = data_Find( data, [ 'player_team', 'Alien' ] );
+function getWeaponData( data ) {
 	
-	//filter only player deaths
-	death_data = data_Find( trim_data, [ 'event_type', 'player_death' ] );
-
-	a_data = death_data.map( a => [ a.round_seconds, a.player_name, a.actor_class ] );
-	Alien_data = [ ];
-	a_data.forEach( function( death ) {
-		Alien_data.push( new Alien_Death( death[ 0 ], death[ 1 ], death[ 2 ] ) );
-	});
-	Alien_data = Alien_data.sort( function( a, b ){ return a.secs - b.secs } );
-
-	//filter all weapon info
 	//filter for Human data
-	trim_data = data_Find( data, [ 'player_team', 'Human' ] );
+	human_data = data_Find( data, [ 'player_team', 'Human' ] );
 	
 	//filter for player_give_damage
-	trim_data = data_Find( trim_data, [ 'event_type', 'player_give_damage' ] );
+	damage_data = data_Find( human_data, [ 'event_type', 'player_give_damage' ] );
 	
 	//TODO: Solve this better
 	//we only want data after starskeys (15 seconds in)
 	new_Data = [ ];
-	trim_data.forEach( function( r ) {
+	damage_data.forEach( function( r ) {
 		if( r.round_seconds > Time_In_Start ) {
 			new_Data.push( r );
 		}
@@ -333,11 +325,104 @@ function get_rnd_Sums( data ) {
 		avg = total / recs;
 		weapons.push( new Weapon_Info( key, avg, total, recs ) );
 	}
+	return weapons;
+}	
+
+function get_rnd_Sums( data ) {
+
+	//get the round end event type for most of the summaries 
+	//( [0] because we want only object of array of objects)	
+	rnd_end_sums = data_Find( data, [ 'event_type', 'round_end' ] )[ 0 ];
+
+	//Find all alien deaths 
+	//filter only Alien team
+	trim_data = data_Find( data, [ 'player_team', 'Alien' ] );
+	
+	//filter only player deaths
+	death_data = data_Find( trim_data, [ 'event_type', 'player_death' ] );
+
+	a_data = death_data.map( a => [ a.round_seconds, a.player_name, a.actor_class ] );
+	Alien_data = [ ];
+	a_data.forEach( function( death ) {
+		Alien_data.push( new Alien_Death( death[ 0 ], death[ 1 ], death[ 2 ] ) );
+	});
+	Alien_data = Alien_data.sort( function( a, b ){ return a.secs - b.secs } );
+
+	//filter all weapon info
+	weapons = getWeaponData( data );
 	
 	return [ rnd_end_sums, Alien_data, weapons ];
 }
 
+function getMatchSums( data, selectedMatch ) {
+	//trim data for only that match:
+	var trim_data = data_Find( data, [ 'match_id', selectedMatch.m_Id ] );
+	
+	//compile ALL weapon summaries:
+	weapons = getWeaponData( trim_data );
+	
+	
+	//for each round record the number of deaths for that round NOTE: ROUND NUMBERS MAY BE OFF
+	matchSummary = [];
+	distinctRoundIds = data_Distinct( trim_data, 'round_id' );
+	//make sure we only consider valid rounds...
+	remove(distinctRoundIds, 'UNINITIALIZED_ROUND_ID');
+	distinctRoundIds.forEach(function(round){
+		var humanDeathCnt = 0;
+		var alienDeathCnt = 0;
+		//trim for only that round
+		roundData = data_Find( trim_data, [ 'round_id', round ] );
+		
+		//get the round summary for that round
+		roundSummarys = data_Find( roundData, [ 'event_type', 'round_end' ] );
+		
+		//get deaths for that round
+		roundDeaths = data_Find( roundData, [ 'event_type', 'player_death' ] );
+		
+		roundDeaths.forEach(function(death){
+			if( death.player_team == 'Human' ){
+				humanDeathCnt += 1;	
+			}
+			else{
+				alienDeathCnt += 1;	
+			}
+		})
+		
+		if( roundSummarys.length > 0 ){
+			roundSummary = roundSummarys[0];
+			matchSummary.push( new Round_Summary( roundSummary.round_number, roundSummary.round_id,
+				roundSummary.timer_expired, roundSummary.winning_team, 
+				roundSummary.surviving_humans, roundSummary.round_seconds, 
+				humanDeathCnt, alienDeathCnt ) );
+		}
+	});
+	
+	return [ weapons, matchSummary ];
+}
+
+function setMapPoints( map_name ){
+	switch( map_name ){
+		//Crank:
+		case 'Ocelot_Map_Crank':
+			worldCenterX = -225.0;
+			worldCenterY = -2150.0;
+			worldSizeX = 24625.0;
+			worldSizeY = 26055.0;
+			break;
+		
+		//Flux:
+		case 'Ocelot_Map_Flux':
+			worldCenterX = 150;
+			worldCenterY = -275;
+			worldSizeX = 24600.0;
+			worldSizeY = 24200.0;
+			break;
+	}
+	
+}
+
 function mapPoints( travel_points, imgWidth, imgHeight ) {
+	console.log('CenX:',worldCenterX,'CenY:',worldCenterY,'SizeX:',worldSizeX,'SizeY:',worldSizeY);
 	pathing = [ ];
 	travel_points.forEach( function ( p ) {
 			p[ 1 ].x = ( ( p[ 1 ].x - worldCenterX) / worldSizeX ) * imgWidth + ( imgWidth / 2 );

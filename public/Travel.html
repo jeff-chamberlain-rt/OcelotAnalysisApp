@@ -2,6 +2,7 @@
 <head>
 	<!-- default is 864x900 --->
 	<img id="Crank" width="864" height="900" src="../img/T_Crank.png" class="hide">
+	<img id="Flux" width="914" height="910" src="../img/T_Flux.png" class="hide">
 	<link rel="stylesheet" type="text/css" href="style/travel.css">
 	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic">
 	<link rel="stylesheet" href="/bower_components/angular-material/angular-material.css">
@@ -26,23 +27,61 @@
 			<select ng-model="selectedMatch" ng-options="x.m_date for x in matches",value="x.m_Id">
 			</select>
 			<br>			
+			<button ng-click="confirmMatch()">ConfirmMatch</button>
 			
-			<p> Select a Round {{selectedRound}}</p>
-			<select ng-model="selectedRound" ng-options="x for x in rounds">
+			<div ng-show="ShowMatchData">
+				<p> Match Weapon Summary </p>
+				<table>
+					<th>Weapon Name</th>
+					<th>Average Damage</th>
+					<th>Total Damage</th>
+					<th>Number of hits</th>
+					<tr ng-repeat="x in Match_Weapon_Data">
+						<td>{{x.weapon_name}}</td>
+						<td>{{x.average_damage}}</td>
+						<td>{{x.total_damage}}</td>
+						<td>{{x.num_records}}</td>	
+					</tr>
+				</table>
+				<p> Match Rounds Summary </p>
+				<table>
+					<th>Round Number (can be incorrect)</th>
+					<th>Round ID </th>
+					<th>Winning Team </th>
+					<th>Human Survivors </th>
+					<th>Overtime? </th>
+					<th>Round Length </th>
+					<th>Human Deaths </th>
+					<th>Alien Deaths </th>
+					<tr ng-repeat="x in Match_Data">
+						<td> {{x.round_number}} </td> 
+						<td> {{x.round_id}} </td>
+						<td> {{x.winningTeam}} </td>
+						<td> {{x.survivors}} </td>
+						<td> {{x.overtime}} </td>
+						<td> {{x.roundlength}} </td>
+						<td> {{x.humanDeaths}} </td>
+						<td> {{x.alienDeaths}} </td>
+					</tr>
+				</table>
+			</div>
+			
+			<p> Select a Round {{selectedRound.round_id}}</p>
+			<select ng-model="selectedRound" ng-options="x.round_number for x in rounds", value="x.round_id">
 			</select>
 			<br>
 			
-			<button ng-click="confirmRoundAndMatch()">Confirm Round/Match</button>
+			<button ng-click="confirmRound()">Confirm Round</button>
 			
 			
 			<div ng-show="showPlayers">
-				<p> Select Humans ( hold cntrl ;d )</p>
+				<p> Select Humans </p>
 				<select multiple ng-model="selectedHumans" ng-options="x for x in humans">
 				</select>
 				<br>
 			
 			
-				<p> Select Aliens ( hold cntrl ;d )</p>
+				<p> Select Aliens </p>
 				<select multiple ng-model="selectedAliens" ng-options="x for x in aliens">
 				</select>
 				<br>
@@ -60,7 +99,6 @@
 					<h2> Round Summaries: </h2>
 					<p> Round Length {{Rnd_length}} </p>
 					<p> Overtime? {{Overtime}} </p>
-					<p> Time Expired? {{Time_Expire}} </p>
 					<p> Which Team Won? {{Winning_Team}} </p>
 					<p> Number of Survivors? {{rnd_survivors}} </p>
 					<p> Alien Deaths: ({{Tot_deaths}} Total Deaths)</p>
@@ -85,7 +123,7 @@
 							<td>{{x.capture}}</td>		
 						</tr>
 					</table>
-					<p> Weapon Summary </p>
+					<p> Round Weapon Summary </p>
 					<table>
 						<th>Weapon Name</th>
 						<th>Average Damage</th>
@@ -98,6 +136,8 @@
 							<td>{{x.num_records}}</td>	
 						</tr>
 					</table>
+					
+					
 				</div>
 			
 			</div>

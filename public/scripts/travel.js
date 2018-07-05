@@ -36,11 +36,11 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 			$scope.showMatchesAndRounds = !$scope.showMatchesAndRounds;
 			trim_data = prep_data( all_Data, $scope.selectedVer );
 			console.log( trim_data );
-			$scope.rounds = get_distinct_rounds( trim_data );
 			$scope.matches = get_distinct_matches( trim_data );
 		}
 	}
 	
+	/*///////
 	//Continue trimming the data for a specific round and match.
 	$scope.confirmRoundAndMatch = function( ){
 		if( $scope.showTravelData ){
@@ -56,6 +56,40 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 				$scope.aliens = res[ 1 ];
 		}
 	}
+	/////////*/
+	$scope.confirmMatch = function( ) {
+		if( $scope.selectedMatch.m_Id ){
+			$scope.rounds = get_distinct_rounds( trim_data, $scope.selectedMatch.m_Id );
+		}
+		
+		
+		//Show match data
+		$scope.ShowMatchData = !$scope.ShowMatchData;
+		res = getMatchSums(trim_data, $scope.selectedMatch);
+		//Weapon Data table
+		if( res[0] != undefined ) {
+			$scope.Match_Weapon_Data = res[ 0 ];
+		}
+		if( res[1] != undefined ){
+			$scope.Match_Data = res[ 1 ];
+		}
+		
+	}
+	$scope.confirmRound = function ( ) {
+		if( $scope.showTravelData ){
+			$scope.showTravelData = !$scope.showTravelData;
+		}
+		if( $scope.selectedRound.round_id && $scope.selectedMatch.m_Id ){
+			$scope.showPlayers = !$scope.showPlayers;
+			$scope.selectedAliens = [ ];
+			$scope.selectedHumans = [ ];
+			game_data = get_Rnd_Data( trim_data, $scope.selectedRound.round_id, $scope.selectedMatch.m_Id );
+			var res = get_distinct_players( game_data );
+			$scope.humans = res[ 0 ];
+			$scope.aliens = res[ 1 ];	
+		}
+	}
+	
 	
 	//Select only certain players and look at their travel patterns
 	$scope.getTravelData = function ( ) {
@@ -64,10 +98,16 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 			//Special functions to be used for travel data
 			//////////////////////////////////////////////	
 			//draw the canvas 
-			function make_Map ( ) {
+			function make_Map ( selectedRound ) {
 				var canvas = document.getElementById( "mapCanvas" );
 				var ctx = canvas.getContext( "2d" );
-				var img = document.getElementById( "Crank" );
+				switch( selectedRound.map_name ) {
+					case 'Ocelot_Map_Crank': var img = document.getElementById( "Crank" ); break;
+					case 'Ocelot_Map_Flux': var img = document.getElementById( "Flux" ); break;
+					//default to crank for now....
+					default: var img = document.getElementById( "Crank" ); break;
+				}
+				setMapPoints( selectedRound.map_name );
 				ctx.drawImage( img,10,10 );
 				ctx.save ( );
 				return [ ctx, img ];
@@ -99,22 +139,25 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 					ctx.fillStyle= colorwheel2[ count ];
 				}
 				
-				//plot spawn point
-				var spwnPnt = mapPoints( player_paths[ 1 ], img.width, img.height )[ 0 ];
-				if( spwnPnt != undefined && spwnPnt[ 1 ] != undefined){
-					ctx.font = "50px Arial";
-					ctx.fillText( "S", spwnPnt[ 1 ].x, spwnPnt[ 1 ].y );
-					spawnSec = spwnPnt[0];
+				if( player_paths[ 1 ] != undefined){
+					//plot spawn point
+					var spwnPnt = mapPoints( player_paths[ 1 ], img.width, img.height )[ 0 ];
+					if( spwnPnt != undefined && spwnPnt[ 1 ] != undefined){
+						ctx.font = "50px Arial";
+						ctx.fillText( "S", spwnPnt[ 1 ].x, spwnPnt[ 1 ].y );
+						spawnSec = spwnPnt[0];
+					}
 				}
 				
-				//plot evac and get time of evac 
-				var evacPnt = mapPoints( player_paths[ 2 ], img.width, img.height )[ 0 ];
-				if( evacPnt != undefined && evacPnt[ 1 ] != undefined){
-					ctx.font = "50px Arial";
-					ctx.fillText( "E", evacPnt[ 1 ].x, evacPnt[ 1 ].y );
-					evacSec = evacPnt[0];
+				if( player_paths[ 2 ] != undefined){
+					//plot evac and get time of evac 
+					var evacPnt = mapPoints( player_paths[ 2 ], img.width, img.height )[ 0 ];
+					if( evacPnt != undefined && evacPnt[ 1 ] != undefined){
+						ctx.font = "50px Arial";
+						ctx.fillText( "E", evacPnt[ 1 ].x, evacPnt[ 1 ].y );
+						evacSec = evacPnt[0];
+					}
 				}
-				
 				
 				//Start and end realtive to the spawn and evac
 				for ( i = 1; i < pathing.length; i++ ) {
@@ -233,12 +276,12 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 			//main code for getTravelData( )
 			////////////////////////////////
 			//Draw the map and plot interesting points
-			var drawer = make_Map( );
+			var drawer = make_Map( $scope.selectedRound );
 			var count = 0;
 			
 			//For each of the selected humans
 			$scope.selectedHumans.forEach( function ( player ) {
-				res = get_player_travel( game_data, player, "Human", $scope.selectedRound, $scope.selectedMatch.m_Id );
+				res = get_player_travel( game_data, player, "Human" );
 				player_paths = [ res[ 0 ], res[ 2 ], res[ 3 ] ];
 				death_points = res[ 1 ];
 				death_secs = plotDeath( death_points, drawer[ 0 ], drawer[ 1 ], count, "Human" );
@@ -250,8 +293,8 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 			//For each of the selected aliens
 			count = 0;
 			$scope.selectedAliens.forEach( function ( player ) {
-				res = get_player_travel( game_data, player, "Alien", $scope.selectedRound, $scope.selectedMatch.m_Id );
-				player_paths = [ res[ 0 ], res[ 2 ] ]
+				res = get_player_travel( game_data, player, "Alien");
+				player_paths = [ res[ 0 ], res[ 2 ] ];
 				death_points = res[ 1 ];
 				death_secs = plotDeath( death_points, drawer[ 0 ], drawer[ 1 ], count, "Alien" );
 				drawTravels( player_paths, drawer[ 0 ], drawer[ 1 ], count, player, "Alien", death_secs );
@@ -280,9 +323,7 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 			
 			//End of Round Data
 			if( res[ 0 ] != undefined ) {
-				console.log(res[0]);
 				$scope.Overtime = res[0].timer_expired;
-				$scope.Time_Expire = res[0].timer_expired;
 				$scope.Winning_Team = res[ 0 ].winning_team;
 				$scope.rnd_survivors = res[ 0 ].surviving_humans;
 				$scope.Rnd_length = res[ 0 ].round_seconds;
@@ -300,10 +341,12 @@ app.controller( "OcelotAnalysisController1", function( $scope, $http ) {
 			}
 		}
 	}
+
 	
 	//refresh button, push after each view of the player map
 	$scope.RefreshFunc = function( ) {
-		$scope.confirmRoundAndMatch( );
+		$scope.confirmRound( );
+		$scope.confirmMatch( );
 		$scope.getTravelData( );
 		$scope.selectedRound = undefined;
 		$scope.selectedMatch = undefined;
