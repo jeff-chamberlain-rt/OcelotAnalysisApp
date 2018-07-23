@@ -1,0 +1,40 @@
+<p> {{summaryTitle}} Weapon Summary </p>
+<table>
+	<th>Weapon Name</th>
+	<th>Average Damage</th>
+	<th>Total Damage</th>
+	<th>Number of hits</th>
+	<tr ng-repeat="x in Weapon_Data">
+		<td>{{x.weapon_name}}</td>
+		<td>{{x.average_damage}}</td>
+		<td>{{x.total_damage}}</td>
+		<td>{{x.num_records}}</td>	
+	</tr>
+</table>
+<p> {{summarySubTitle}} Summary </p>
+<table>
+	<th>Round Number (can be incorrect)</th>
+	<th>Round ID </th>
+	<th>Winning Team </th>
+	<th>Human Survivors </th>
+	<th>Overtime? </th>
+	<th>Timer Expired? </th>
+	<th>Round Length </th>
+	<th>Human Deaths </th>
+	<th>Alien Deaths </th>
+	<th>Control Point Activated </th>
+	<th>Control Point Captured </th>
+	<tr ng-repeat="x in Game_Data">
+		<td> {{x.round_number}} </td> 
+		<td> {{x.round_id}} </td>
+		<td> {{x.winningTeam}} </td>
+		<td> {{x.survivors}} </td>
+		<td> {{x.overtime}} </td>
+		<td> {{x.expired}} </td>
+		<td> {{x.roundlength}} </td>
+		<td> {{x.humanDeaths}} </td>
+		<td> {{x.alienDeaths}} </td>
+		<td> {{x.ctrlAct}} </td>
+		<td> {{x.ctrlCap}} </td>	
+	</tr>
+</table>

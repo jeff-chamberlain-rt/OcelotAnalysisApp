@@ -178,8 +178,8 @@ var app = angular.module( 'OcelotAnalysisApp', [ 'ngMaterial', 'ngMessages', 'co
       analysisData.setData ( response.data );
     });
   }
-
-  initData ();
+  
+  initData();
 })
 .directive ("filterSelect", function( analysisData ) {
   return {
