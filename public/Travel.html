@@ -11,139 +11,138 @@
 	rel="stylesheet">
 </head>
 <body ng-app="OcelotAnalysisApp">
-	<div  ng-controller="OcelotAnalysisController1">
-	
-		<p> Select a Version </p>
-		<select ng-model="selectedVer" ng-options="x for x in vers">
-		</select>
-		<h1> Display data from: {{selectedVer}}</h1>
-
-		
-		<button ng-click="confirmVersion()">Confirm Version</button>
-		<button ng-click="RefreshFunc()">Refresh </button>
-		<div ng-show="showMatchesAndRounds">
-			
-			<p> Select a Match Date, Selected ID: {{selectedMatch.m_Id}}</p>
-			<select ng-model="selectedMatch" ng-options="x.m_date for x in matches",value="x.m_Id">
-			</select>
-			<br>			
-			<button ng-click="confirmMatch()">ConfirmMatch</button>
-
-			<div ng-show="ShowMatchData">
-				<p> Match Weapon Summary </p>
-				<table>
-					<th>Weapon Name</th>
-					<th>Average Damage</th>
-					<th>Total Damage</th>
-					<th>Number of hits</th>
-					<tr ng-repeat="x in Match_Weapon_Data">
-						<td>{{x.weapon_name}}</td>
-						<td>{{x.average_damage}}</td>
-						<td>{{x.total_damage}}</td>
-						<td>{{x.num_records}}</td>	
-					</tr>
-				</table>
-				<p> Match Rounds Summary </p>
-				<table>
-					<th>Round Number (can be incorrect)</th>
-					<th>Round ID </th>
-					<th>Winning Team </th>
-					<th>Human Survivors </th>
-					<th>Overtime? </th>
-					<th>Timer Expired? </th>
-					<th>Round Length </th>
-					<th>Human Deaths </th>
-					<th>Alien Deaths </th>
-					<tr ng-repeat="x in Match_Data">
-						<td> {{x.round_number}} </td> 
-						<td> {{x.round_id}} </td>
-						<td> {{x.winningTeam}} </td>
-						<td> {{x.survivors}} </td>
-						<td> {{x.overtime}} </td>
-						<td> {{x.expired}} </td>
-						<td> {{x.roundlength}} </td>
-						<td> {{x.humanDeaths}} </td>
-						<td> {{x.alienDeaths}} </td>
-					</tr>
-				</table>
-			</div>
-			
-			<p> Select a Round, Selected ID: {{selectedRound.round_id}}</p>
-			<select ng-model="selectedRound" ng-options="x.round_number for x in rounds", value="x.round_id">
-			</select>
-			<br>
-			
-			<button ng-click="confirmRound()">Confirm Round</button>
-			
-			
-			<div ng-show="showPlayers">
-				<span class = "PickPlayers">
-					<p> Select Humans: </p>
-					<select multiple ng-model="selectedHumans" ng-options="x for x in humans">
-					</select>
-					<br>
-				</span>
-				<span class = "PickPlayers">
-					<p> Select Aliens: </p>
-					<select multiple ng-model="selectedAliens" ng-options="x for x in aliens">
-					</select>
-					<br>
-				</span>
+	<div  ng-controller="OcelotAnalysisController">
+		<h2> Ocelot Travel Analysis </h2>
+		<div ng-if="!Versions"> Loading... </div>
+		<div ng-show="Versions">
+			<div class="grid-container">
 				
-				<p> View Players:</p>
-				<p> Selected Humans: {{selectedHumans}} </p>
-				<p> Selected Aliens: {{selectedAliens}}
-				<br>
-				<button ng-click="getTravelData()">Confirm Selected Players</button>
-				<div ng-show="showTravelData">
-					<h2> Player's Travel </h2>
+				<!--- Version Cell --->
+				<div>
+					<!--- Version Dropbox --->
+					<md-input-container style="margin-right: 10px;">
+						<label>Version</label>
+						<md-select ng-model="selectedVersion" ng-change="setVersion()">
+							<md-option ng-repeat="x in Versions" value="{{x}}">{{x}}</md-option>
+						</md-select>
+					</md-input-container>
 					
-					<canvas id="mapCanvas" width="864" height="900"></canvas>
-					<br>
-					<h2> Round Summaries: </h2>
-					<table>
-						<th>Time of Death</th>
-						<th>Alien Type</th>
-						<th>Player Name</th>
-						<tr ng-repeat="x in Alien_Data">
-							<td>{{ x.secs }}</td>
-							<td>{{ x.a_type }}</td>
-							<td>{{ x.player }}</td>
-						</tr>
-					</table>
-					<p> Command Point Summary </p>
-					<table>
-						<th>Point #</th>
-						<th>Activation Time</th>
-						<th>Capture Time</th>
-						<tr ng-repeat="x in cmd_Info">
-							<td>{{ $index + 1 }}</td>
-							<td>{{x.activation}}</td>
-							<td>{{x.capture}}</td>		
-						</tr>
-					</table>
-					<p> Round Weapon Summary </p>
-					<table>
-						<th>Weapon Name</th>
-						<th>Average Damage</th>
-						<th>Total Damage</th>
-						<th>Number of hits</th>
-						<tr ng-repeat="x in Weapon_Data">
-							<td>{{x.weapon_name}}</td>
-							<td>{{x.average_damage}}</td>
-							<td>{{x.total_damage}}</td>
-							<td>{{x.num_records}}</td>	
-						</tr>
-					</table>
+					<!--- Version Checkbox --->
+					<div>
+						<div ng-show="selectedVersion">
+						Show Version Summary <input type="checkbox" id="CheckVersion"  ng-click="showVersionSummary()">
+						</div>
+					</div>
 					
-					
+					<!--- Version Summary --->
+					<div id="VersionSummary" style="display:none">
+						<version-summary ng-if="selectedVersion"></version-summary>
+					</div>
 				</div>
-			
+				
+				<!--- Match cell --->
+				<div>
+					<!--- Match Dropbox --->
+					<div ng-show="selectedVersion">
+						<md-input-container style="margin-right: 10px;">
+							<label>Matches</label>
+							<md-select ng-model="selectedMatch" ng-change="setMatch()">
+								<md-option ng-repeat="x in getMatches()" ng-value=x.m_Id>{{x.m_date | date:'medium'}}</md-option>
+							</md-select>
+						</md-input-container>
+					</div>
+					
+					<!--- Match Checkbox --->
+					<div>
+						<div ng-show="selectedMatch">
+						Show Match Summary <input type="checkbox" id="CheckMatch"  ng-click="showMatchSummary()">
+						</div>
+					</div>
+					
+					<!--- Match Summary --->
+					<div id="MatchSummary" style="display:none">
+						<match-summary ng-if="selectedMatch"></match-summary>
+					</div>
+				</div>
+				
+				<!--- Round Cell --->
+				<div>
+					<!--- Round Dropbox --->
+					<div ng-show="selectedMatch">
+						<md-input-container style="margin-right: 10px;">
+							<label>Round</label>
+							<md-select ng-model="selectedRound" ng-change="setRound()">
+								<md-option ng-repeat="x in getRounds()" ng-value=x.round_id>{{x.round_number}}</md-option>
+							</md-select>
+						</md-input-container>
+					</div>
+					
+					<!--- Round Checkbox --->
+					<div>
+						<div ng-show="selectedRound">
+						Show Round Summary <input type="checkbox" id="CheckRound"  ng-click="showRoundSummary()">
+						</div>
+					</div>
+					
+					<!--- Round Summary --->
+					<div id="RoundSummary" style="display:none">
+						<round-summary ng-if="selectedRound"></round-summary>
+					</div>
+	
+					<!--- Select Players--->
+					<!--- Humans --->
+					<div ng-show="selectedRound">
+						<md-input-container style="margin-right: 10px;">
+							<label>Humans</label>
+							<md-select multiple ng-model="selectedHumans" ng-change="showMap()">
+								<md-option>Select All</md-option>
+								<md-option ng-repeat="x in getPlayers()[0]" ng-value=x>{{x}}</md-option>
+								<md-option>Clear</md-option>
+							</md-select>
+							<br>
+						</md-input-container>
+					</div>
+					
+					<!--- Aliens --->
+					<div ng-show="selectedRound">
+						<md-input-container style="margin-right: 10px;">
+							<label>Aliens</label>
+							<md-select multiple ng-model="selectedAliens" ng-change="showMap()">
+								<md-option>Select All</md-option>
+								<md-option ng-repeat="x in getPlayers()[1]" ng-value=x>{{x}}</md-option>
+								<md-option>Clear</md-option>
+							</md-select>
+						</md-input-container>
+					</div>
+					
+					<!--- Command Point Table --->
+					<div ng-show="cmdInfoTable">
+						<table>
+							<th>Command Point Number</th>
+							<th>Spawn Time</th>
+							<th>Activated Time</th>
+							<th>Captured Time</th>
+							<tr ng-repeat="x in cmdInfoTable">
+								<td>{{ x[0] }}</td>
+								<td>{{ x[1] }}</td>
+								<td>{{ x[2] }}</td>
+								<td>{{ x[3] }}</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				
+				<!--- map --->
+				<div>
+					<div ng-show="selectedRound">
+						<img id="Crank" width="864" height="900" src="../img/T_Crank.png" class="hide">
+						<img id="Flux" width="914" height="910" src="../img/T_Flux.png" class="hide">
+						<canvas id="mapCanvas" width="864" height="900"></canvas>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-	
-	
 	<script src="/bower_components/angular/angular.js"></script>
 	<script src="/bower_components/angular-aria/angular-aria.js"></script>
 	<script src="/bower_components/angular-animate/angular-animate.js"></script>
@@ -152,8 +151,7 @@
 	<script src="/bower_components/angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.js"></script>
 	<script src="/bower_components/d3/d3.js"></script>
 	<script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
-	<script src="/scripts/Travel_helpers.js"></script>
-	<script src="/scripts/travel.js"></script>
-	
+	<script src="/scripts/travel_factory.js"></script>
+	<script src="/scripts/travel_controller.js"></script>
 </body>
 </html>

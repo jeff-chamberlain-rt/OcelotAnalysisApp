@@ -29,6 +29,7 @@ app.get('/travel', function(req, res) {
     res.sendFile(path.join(__dirname + '/public/Travel.html'));
 });
 
+
 app.get('/data', function(req, res) {
   MongoClient.connect(mongoURL, function(err, client) {
     assert.equal(null, err);
