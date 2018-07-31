@@ -140,6 +140,24 @@
 						<canvas id="mapCanvas" width="864" height="900"></canvas>
 					</div>
 				</div>
+				
+				<!--- Leader Board -->
+				<div>
+					<h2>Leader Board Stats</h2>
+					<p>(in development)</p>
+					<label>From Version</label>
+					<md-select ng-model="fromVersion" ng-change="setLB()">
+						<md-option ng-repeat="x in Versions" value="{{x}}">{{x}}</md-option>
+					</md-select>
+					<label>To Version</label>
+					<md-select ng-model="toVersion" ng-change="setLB()">
+						<md-option ng-repeat="x in Versions" value="{{x}}">{{x}}</md-option>
+					</md-select>
+					I solemnly swear that I am up to no good<input type="checkbox" id="CheckLeaders"  ng-click="showLeaderBoard()">
+					<div id="leaderBoard" style="display:none">
+						<ocelot-leaderboard></ocelot-leaderboard>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
