@@ -7,6 +7,29 @@ const colorWheel = ['#e6194b','#3cb44b','#ffe119','#0082c8',
 					'#aa6e28','#fffac8','#800000','#aaffc3'];
 
 //Prototypes:
+function playerStats(_kills, _deaths, _totLifetime, _roundsStarted,_lives){
+	this.kills = _kills || 0;
+	this.deaths = _deaths || 0;
+	this.totLifetime = _totLifetime || 0;
+	this.roundsStarted = _roundsStarted || 0;
+	this.lives = _lives || 0;
+}
+playerStats.prototype.combineStats = function (s2){
+	this.kills += s2.kills;
+    this.deaths += s2.deaths;
+	this.roundsStarted += s2.roundsStarted;
+	this.totLifetime += s2.totLifetime;
+	this.lives += s2.lives;
+}
+
+function playerHistory(name, played, allHumanStats, allAlienStats){	
+	this.player = name;
+	this.played = played;
+	this.lifetimeHumanStats = allHumanStats;
+	this.lifetimeAlienStats = allAlienStats;
+}
+
+
 function Match_Info( Id, m_date ) {
 	this.m_Id = Id;
 	this.m_date = m_date;
@@ -118,6 +141,7 @@ app.factory( 'analysisData', function( ){
 	var worldCenterY = 1;
 	var worldSizeX = 1;
 	var worldSizeY = 1;
+	var lbDict={};
 	
 	//Setters:
 	function setData( _data ){
@@ -126,7 +150,7 @@ app.factory( 'analysisData', function( ){
 			console.log('ERROR SETTING DATA');
 			return;
 		}
-		console.log(data);
+		console.log('ALL DATA:',data);
 		
 		
 		//Set and sort the possible versions
@@ -206,7 +230,123 @@ app.factory( 'analysisData', function( ){
 		}
 	}
 	
+	function setLeaderBoard( vFrom, vTo ){
+		lbDict={};
+		//only look at data after a certain version
+		vFromNdx = versions.indexOf(vFrom);
+		vToNdx = versions.indexOf(vTo);
+		if(vToNdx <= vFromNdx){
+			ConsideredVersions = versions.slice(vToNdx,vFromNdx+1);
+		}
+		else{
+			console.log('error in slice');
+			return 0;
+		}
+		console.log('Leaderboard verisons: ',ConsideredVersions);
+		scopeData = data.filter(a => ConsideredVersions.indexOf(a.app_version) > -1);
+		console.log(scopeData);
+		
+		//get all round ids
+		temp = scopeData.map( a => a.round_id );
+		var round_ids = temp.filter( onlyUnique );
+		remove(round_ids,'UNINITIALIZED_ROUND_ID');
+		round_ids.forEach(function (rId){
+			//get only events from that round
+			usedData = scopeData.filter(a => a.round_id == rId);	
+			endRound = usedData.filter(a => a.event_type == 'round_end')[0];
+			if(endRound != undefined){
+				//find all players and record their information
+				temp = usedData.map(a=>a.player_name);
+				roundPlayers = temp.filter( onlyUnique );
+				remove(roundPlayers, 'UNINITIALIZED_PLAYER_NAME');
+				roundPlayers.forEach(function(player){
+					if(player){
+						//get player data
+						humanStats = new playerStats( );
+						alienStats = new playerStats( );
+						playerData = usedData.filter(a => a.player_name == player);
+						
+						//get starting team:
+						sInfo = playerData.filter(a => a.event_type == 'player_heartbeat').sort(function(a,b){return a.round_seconds-b.round_seconds})[0]
+						if(sInfo){
+							sTeam = sInfo.player_team;
+							schema_version = sInfo.schema_version;
+							switch(sTeam){
+								case 'Alien': alienStats.roundsStarted += 1; break;
+								case 'Human': humanStats.roundsStarted += 1; break;
+							}
+						}
+						//get kills from both sides and deaths	
+						humanDeathTime = -1;
+						alienLifespans = [];
+						
+						playerKillData = playerData.filter(a => a.event_type == 'player_kill');
+						playerKillData.forEach(function (kill){
+							switch(kill.player_team){
+								case 'Human': humanStats.kills += 1; break;
+								case 'Alien': alienStats.kills += 1;break;
+							}
+						});	
+						playerDeathData = playerData.filter(a => a.event_type == 'player_death');
+						playerDeathData.forEach(function (death){
+							switch(death.player_team){
+								case 'Human': humanStats.deaths += 1; humanDeathTime = death.round_seconds; break;
+								case 'Alien': alienStats.deaths += 1; alienLifespans.push(death.player_lifespan); break;
+								
+							}
+						});
+						
+						//calculate humanlifetime
+						if(sTeam == 'Human'){
+							humanSpawntime = Time_In_Start; //default spawn in time for humans
+							if(humanDeathTime > 0){
+									humanStats.totLifetime = humanDeathTime-humanSpawntime;
+									humanStats.lives += 1;
+							}
+							else { //human made it to the end of the round
+									humanStats.totLifetime = endRound.round_seconds-humanSpawntime;
+									humanStats.lives += 1;
+							}
+						}
+						//calculate alien lifetimes*
+						//some deaths (or console command repawns not included)
+						//only includes events where 'player_lifespan' is working properly (due to issue above)
+						if(schema_version == '0.0.2'){
+							alienLifespans.forEach(function(lifespan){
+								alienStats.totLifetime += lifespan;
+								alienStats.lives += 1;
+							});
+						}
+						
+						//if not in the dict add them
+						if(!(player in lbDict)){
+							lbDict[player] = new playerHistory(player, 1, humanStats, alienStats);
+							console.log('NEW PLAYER: ',lbDict[player]);
+						}
+						else{
+							lbDict[player].played +=1;
+							lbDict[player].lifetimeHumanStats.combineStats(humanStats);
+							lbDict[player].lifetimeAlienStats.combineStats(alienStats);
+						}
+					}
+				});
+			}
+			else{
+				console.log('End round not recorded for:',rId);
+			}
+		});
+
+	}
+	
 	//Getters:
+	function getLeaderBoard(){
+		result = [];
+		for( var key in lbDict){
+			result.push([key,lbDict[key]]);
+		}
+		return result;
+	}
+	
 	function getCmdInfo(imgConstants){
 		mapConstants = getMapPoints();
 		//grab the spawn for their plot
@@ -410,6 +550,8 @@ app.factory( 'analysisData', function( ){
 	}
 	
 	return {
+		'getLeaderBoard': getLeaderBoard,
+		'setLeaderBoard': setLeaderBoard,
 		'getCmdInfo': getCmdInfo,
 		'setMapPoints': setMapPoints,
 		'getPlayerInfo': getPlayerInfo,

@@ -93,7 +93,8 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 			console.log('DATA RECEIVED');
 			analysisData.setData ( response.data );
 			$scope.Versions = analysisData.getVersions();
-			console.log('Ready...');
+			console.log('Versions determined');
+			$scope.evalLeaders = false;
 		});
 	}
 	
@@ -138,6 +139,14 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 	$scope.setVersion = function( ){
 		analysisData.setVersion($scope.selectedVersion);
 		clearChildren('version');
+	}
+	
+	$scope.setLB = function( ){
+		if($scope.fromVersion && $scope.toVersion){
+			console.log('From: ',$scope.fromVersion);
+			console.log('To: ',$scope.toVersion);
+			analysisData.setLeaderBoard( $scope.fromVersion, $scope.toVersion)
+		}
 	}
 	
 	$scope.getMatches = function(){
@@ -189,6 +198,19 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 			rSum.style.display = "block";
 		} else {
 			rSum.style.display = "none";
+		}
+	}
+	
+	
+	$scope.showLeaderBoard = function() {
+		var checkBox = document.getElementById("CheckLeaders");
+		var lTab = document.getElementById("leaderBoard");
+		if (checkBox.checked == true) {
+			lTab.style.display = "block";
+			$scope.evalLeaders = true;
+		} else {
+			lTab.style.display = "none";
+			$scope.evalLeaders = false;
 		}
 	}
 	
@@ -275,6 +297,18 @@ app.directive('roundSummary', function(analysisData) {
 			scope.$watch('selectedRound',function (){
 			scope.Weapon_Data = analysisData.getWeapon_Data('round');
 			scope.Game_Data = analysisData.getGame_Data('round');
+			})
+		}
+	}
+});
+
+app.directive('ocelotLeaderboard', function(analysisData) {
+	return  {
+		templateUrl: 'ocelot-leaderboard.html',
+		link: function(scope) {
+				scope.$watch('evalLeaders',function(){
+					scope.leaderTable = analysisData.getLeaderBoard();
+					console.log('LB Table: ',scope.leaderTable);
 			})
 		}
 	}
