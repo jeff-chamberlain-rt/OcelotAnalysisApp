@@ -1,4 +1,8 @@
+//This file serves as the main control file and handles interaction
+//between the user and the data 
+
 //Draw logic
+//Command point draw logic
 function drawCommandPoints(ctx, res){
 	ref = 1;
 	cmdTable = [];
@@ -14,7 +18,7 @@ function drawCommandPoints(ctx, res){
 	return cmdTable;
 }
 
-
+//Human travel, spawn, and death draw logic
 function drawHuman(ctx, img, res, cnt){	
 	spawnPnt = res[2][0]; //there's only one point for humans
 	travelPnts = res[0];
@@ -84,9 +88,10 @@ function drawHuman(ctx, img, res, cnt){
 	
 }
 
+//TODO:
+//Draw Alien logic (if desired)
 
 //Controller and directives:
-
 app.controller("OcelotAnalysisController", function ($scope, $http, analysisData) {
 	function initData() {
 		$http.get('/data').then(function(response) {
@@ -95,6 +100,7 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 			$scope.Versions = analysisData.getVersions();
 			console.log('Versions determined');
 			$scope.evalLeaders = false;
+			$scope.lbOptions = lbOptions;
 		});
 	}
 	
@@ -136,11 +142,13 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 		}	
 	}
 
+	//set version based on user selection and update the used data
 	$scope.setVersion = function( ){
 		analysisData.setVersion($scope.selectedVersion);
 		clearChildren('version');
 	}
 	
+	//set the leaderboard based based on user From and TO
 	$scope.setLB = function( ){
 		if($scope.fromVersion && $scope.toVersion){
 			console.log('From: ',$scope.fromVersion);
@@ -149,28 +157,34 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 		}
 	}
 	
+	//return matches with dates for select
 	$scope.getMatches = function(){
 		return analysisData.getMatches();
 	}
 	
+	//Set match based on user selection and update the used data
 	$scope.setMatch = function( ){
 		analysisData.setMatch($scope.selectedMatch);
 		clearChildren('match');
 	}
 	
+	//get the rounds based on user selction, remove weird rounds that hav little or no data 
 	$scope.getRounds = function(){
 		return analysisData.getRounds();
 	}
 	
+	//Return players for select
 	$scope.getPlayers = function() {
 		return analysisData.getPlayers();
 	}
 	
+	//set the round based on user selection and update used data
 	$scope.setRound = function( ){
 		analysisData.setRound($scope.selectedRound);
 		clearChildren('round');
 	}
 	
+	//Show the game summary based on the selected version
 	$scope.showVersionSummary = function() {
 		var checkBox = document.getElementById("CheckVersion");
 		var vSum = document.getElementById("VersionSummary");
@@ -181,6 +195,7 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 		}
 	}
 	
+	//Show the match summary based on the selected match
 	$scope.showMatchSummary = function() {
 		var checkBox = document.getElementById("CheckMatch");
 		var mSum = document.getElementById("MatchSummary");
@@ -191,6 +206,7 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 		}
 	}
 	
+	//Show the round summary based on the selected round
 	$scope.showRoundSummary = function() {
 		var checkBox = document.getElementById("CheckRound");
 		var rSum = document.getElementById("RoundSummary");
@@ -201,7 +217,7 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 		}
 	}
 	
-	
+	//Show the leader board based on user selected to and from
 	$scope.showLeaderBoard = function() {
 		var checkBox = document.getElementById("CheckLeaders");
 		var lTab = document.getElementById("leaderBoard");
@@ -214,6 +230,7 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 		}
 	}
 	
+	//Show the map based on the round and the paths of the players selected
 	$scope.showMap = function( ){
 		//DropBox commands
 		if($scope.selectedHumans.indexOf('Select All') > -1){
@@ -259,6 +276,7 @@ app.controller("OcelotAnalysisController", function ($scope, $http, analysisData
 	
 });
 
+//Directive to show version summary
 app.directive('versionSummary', function(analysisData) {
 	console.log(analysisData.getWeapon_Data('version'));
 	return  {
@@ -274,6 +292,7 @@ app.directive('versionSummary', function(analysisData) {
 	}
 });
 
+//Driective to shoow match summary
 app.directive('matchSummary', function(analysisData) {
 	return  {
 		templateUrl: 'summary-template.html',
@@ -288,6 +307,7 @@ app.directive('matchSummary', function(analysisData) {
 	}
 });
 
+//Directive to show round summary
 app.directive('roundSummary', function(analysisData) {
 	return  {
 		templateUrl: 'summary-template.html',
@@ -302,12 +322,13 @@ app.directive('roundSummary', function(analysisData) {
 	}
 });
 
+//Directive to show loeader board
 app.directive('ocelotLeaderboard', function(analysisData) {
 	return  {
 		templateUrl: 'ocelot-leaderboard.html',
 		link: function(scope) {
 				scope.$watch('evalLeaders',function(){
-					scope.leaderTable = analysisData.getLeaderBoard();
+					scope.leaderTable = analysisData.getLeaderBoard(scope.humanSortBy, scope.alienSortBy);
 					console.log('LB Table: ',scope.leaderTable);
 			})
 		}

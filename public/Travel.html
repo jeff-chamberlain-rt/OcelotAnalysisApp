@@ -103,7 +103,7 @@
 						</md-input-container>
 					</div>
 					
-					<!--- Aliens --->
+					<!--- TODO: Aliens
 					<div ng-show="selectedRound">
 						<md-input-container style="margin-right: 10px;">
 							<label>Aliens</label>
@@ -114,6 +114,7 @@
 							</md-select>
 						</md-input-container>
 					</div>
+					--->
 					
 					<!--- Command Point Table --->
 					<div ng-show="cmdInfoTable">
@@ -145,6 +146,16 @@
 				<div>
 					<h2>Leader Board Stats</h2>
 					<p>(in development)</p>
+					<!--- TODO: SORT
+					<label>Sort Humans by</label>
+					<md-select ng-model="humanSortBy" ng-change="setLB()">
+						<md-option ng-repeat="x in lbOptions" value="{{x}}">{{x}}</md-option>
+					</md-select>
+					<label>Sort Aliens by</label>
+					<md-select ng-model="alienSortBy" ng-change="setLB()">
+						<md-option ng-repeat="x in lbOptions" value="{{x}}">{{x}}</md-option>
+					</md-select>
+					--->
 					<label>From Version</label>
 					<md-select ng-model="fromVersion" ng-change="setLB()">
 						<md-option ng-repeat="x in Versions" value="{{x}}">{{x}}</md-option>
