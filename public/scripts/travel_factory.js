@@ -1,5 +1,11 @@
+//This file serves to handle all logic applied to the data
+//Based on information sent from the controller 
+
 //Constants
 const Time_In_Start = 20;
+
+const lbOptions = ['Total Rounds Played','Rounds Started','Total Kills','Total Deaths','Avg Lifespan',
+					'Avg Kills Per Round','Avg Deaths Per Round','K/D'];
 
 const colorWheel = ['#e6194b','#3cb44b','#ffe119','#0082c8',
 					'#f58231','#911eb4','#46f0f0','#f032e6',
@@ -7,6 +13,8 @@ const colorWheel = ['#e6194b','#3cb44b','#ffe119','#0082c8',
 					'#aa6e28','#fffac8','#800000','#aaffc3'];
 
 //Prototypes:
+
+//Used for leaderboards
 function playerStats(_kills, _deaths, _totLifetime, _roundsStarted,_lives){
 	this.kills = _kills || 0;
 	this.deaths = _deaths || 0;
@@ -29,12 +37,13 @@ function playerHistory(name, played, allHumanStats, allAlienStats){
 	this.lifetimeAlienStats = allAlienStats;
 }
 
-
+//Used for showing dates for the matches
 function Match_Info( Id, m_date ) {
 	this.m_Id = Id;
 	this.m_date = m_date;
 }
 
+//Used for weapon summary
 function Weapon_Info( name, avg_dam, tot_dam, records ) {
 	this.weapon_name = name;
 	this.average_damage = avg_dam;
@@ -42,6 +51,8 @@ function Weapon_Info( name, avg_dam, tot_dam, records ) {
 	this.num_records = records;
 }
 
+
+//Used for round summery (LIKELYY CHANGE TO FIT NEEDS OF NEW DIRECTION)
 function Round_Summary( rnd_num, rnd_id, overtime, expired, winners, survivors, roundlength, humanDeathCnt, alienDeathCnt, ctrlAct, ctrlCap) {
 	this.round_number = rnd_num;
 	this.round_id = rnd_id;
@@ -57,6 +68,7 @@ function Round_Summary( rnd_num, rnd_id, overtime, expired, winners, survivors, 
 	
 }
 
+//Used for plotting 
 function Point( x, y, z ) {
 	this.x = x;
 	this.y = y;
@@ -68,10 +80,6 @@ function infoPoint( p, s, t){
 	this.loc = p;
 	this.secs = s;
 	this.extra = t;
-	/*
-		player_heartbeat: extra = is_sprinting
-		default: extra = event_type
-	*/
 }
 
 //Common functions:
@@ -88,16 +96,8 @@ function remove(array, element) {
         array.splice(index, 1);
     }
 }
-/*mapConstants:
-mapConstants[0]=worldCenterX
-mapConstants[1]=worldCenterY
-mapConstants[2]=worldSizeX
-mapConstants[3]=worldSizeY
 
-imgConstants:
-imgConstants[0]=imgWidth
-imgConstants[1]=imgHeight
-*/
+//Used to grab the infoPoints from the any event. Thus call this when you want to plot information
 function extractInfoPoints( data , mapConstants, imgConstants){
 	//Map the data to only the important info
 	retPoints=[];
@@ -144,6 +144,7 @@ app.factory( 'analysisData', function( ){
 	var lbDict={};
 	
 	//Setters:
+	//Set the data to be all data from the database, Select version to trim by. 
 	function setData( _data ){
 		data = _data;
 		if( !data || data.length == 0 ){
@@ -165,6 +166,7 @@ app.factory( 'analysisData', function( ){
 		//console.log(versions);
 	}
 	
+	//Trim the data to only look at one particular app_version of the game
 	function setVersion(v) {
 		version = v;
 		
@@ -187,6 +189,7 @@ app.factory( 'analysisData', function( ){
 		Matches = returnedMatches;
 	}
 	
+	//Trim data to only look at one particular match
 	function setMatch(m){
 		match = m;
 		
@@ -201,6 +204,7 @@ app.factory( 'analysisData', function( ){
 		Rounds = returnedRounds.sort( function( a, b ){ return a.round_number - b.round_number });
 	}
 	
+	//Trim data to only look at one particular round
 	function setRound(r){
 		round = r;
 		
@@ -210,6 +214,8 @@ app.factory( 'analysisData', function( ){
 		//console.log(roundData);
 	}
 	
+	//Based on the map name, set the constant value to be used for that round
+	//(*LIKELY WILL BE UPDATED AS NEW MAPS ARE MADE)
 	function setMapPoints( map_name ){
 		switch( map_name ){
 			//Crank:
@@ -230,6 +236,8 @@ app.factory( 'analysisData', function( ){
 		}
 	}
 	
+	//Set the leaderboard considering only versions between (inclusive) vFrom and vTo
+	//(LIKELY CHANGE TO MEET NEEDS OF NEW DIRECTION)
 	function setLeaderBoard( vFrom, vTo ){
 		lbDict={};
 		//only look at data after a certain version
@@ -331,7 +339,7 @@ app.factory( 'analysisData', function( ){
 					}
 				});
 			}
-			else{
+			else{	//If a round isnt recorded proprely we do not consider it
 				console.log('End round not recorded for:',rId);
 			}
 		});
@@ -339,14 +347,21 @@ app.factory( 'analysisData', function( ){
 	}
 	
 	//Getters:
-	function getLeaderBoard(){
+	//Grab the leaderboard
+	function getLeaderBoard(_sortHumansByColumn,_sortAliensByColumn){
+		sortHumansByColumn = _sortHumansByColumn || false;
+		sortAliensByColumn = _sortAliensByColumn || false;
 		result = [];
 		for( var key in lbDict){
 			result.push([key,lbDict[key]]);
 		}
-		return result;
+		console.log('Humans Sorted by: ',sortHumansByColumn,'Aliens Sorted By: ',sortAliensByColumn);
+		//TODO: SORTING ALG
+		return [result,result];
 	}
 	
+	//Grab info about command points and plot them in order
+	//(LIKELY CHANGE TO MEET NEEDS OF NEW DIRECTION)
 	function getCmdInfo(imgConstants){
 		mapConstants = getMapPoints();
 		//grab the spawn for their plot
@@ -389,7 +404,7 @@ app.factory( 'analysisData', function( ){
 		return cmdPointInfo;
 	}
 	
-	
+	//Get all the players on both sides and return them
 	function getPlayers(){
 		humans = roundData.filter(d=> d.player_team == 'Human');
 		aliens = roundData.filter(d=> d.player_team == 'Alien');
@@ -401,6 +416,7 @@ app.factory( 'analysisData', function( ){
 		return [ human_players, alien_players ];
 	}
 	
+	//Grab the weapon summary relative to what was asked for
 	function getWeapon_Data(sType){
 		switch(sType){
 			case 'version': usedData = versionData; break;
@@ -439,10 +455,12 @@ app.factory( 'analysisData', function( ){
 		return weapons;
 	}
 
+	//Get the dimensions of the map 
 	function getMapPoints(){
 		return [worldCenterX,worldCenterY,worldSizeX,worldSizeY];
 	}
 	
+	//Return a summary of the what is requested
 	function getGame_Data(sType){
 		switch(sType){
 			case 'version': usedData = versionData; break;
@@ -492,6 +510,7 @@ app.factory( 'analysisData', function( ){
 		return Summary.sort(function(a,b){return a.round_number - b.round_number});
 	}
 	
+	//Generic getters
 	function getData(){
 		return data;
 	}
@@ -520,6 +539,7 @@ app.factory( 'analysisData', function( ){
 		return match;
 	}
 	
+	//Get the Travel path, spawn, and death infoPoints of a player in a given round
 	function getPlayerInfo(pName, pTeam, imgConstants){
 		usedData = roundData.filter(d=>d.player_name == pName);
 		mapConstants = getMapPoints();
@@ -544,6 +564,8 @@ app.factory( 'analysisData', function( ){
 		
 		return [hbeatInfo, deathInfo, spawnInfo];
 	}
+	
+	//Get the map name of what map is used on a given round
 	function getMap(){
 		roundBegin = roundData.filter(d=>d.event_type == 'round_begin');
 		return roundBegin[0].map_name;

@@ -1,3 +1,4 @@
+<!--- This template is the outline for all summaries shown -->
 <p> {{summaryTitle}} Weapon Summary </p>
 <table>
 	<th>Weapon Name</th>
@@ -15,10 +16,7 @@
 <table>
 	<th>Round Number (can be incorrect)</th>
 	<th>Round ID </th>
-	<th>Winning Team </th>
 	<th>Human Survivors </th>
-	<th>Overtime? </th>
-	<th>Timer Expired? </th>
 	<th>Round Length </th>
 	<th>Human Deaths </th>
 	<th>Alien Deaths </th>
@@ -27,10 +25,7 @@
 	<tr ng-repeat="x in Game_Data">
 		<td> {{x.round_number}} </td> 
 		<td> {{x.round_id}} </td>
-		<td> {{x.winningTeam}} </td>
 		<td> {{x.survivors}} </td>
-		<td> {{x.overtime}} </td>
-		<td> {{x.expired}} </td>
 		<td> {{x.roundlength}} </td>
 		<td> {{x.humanDeaths}} </td>
 		<td> {{x.alienDeaths}} </td>

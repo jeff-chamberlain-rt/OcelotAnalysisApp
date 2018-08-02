@@ -1,27 +1,56 @@
+<!--- This template is for what info is shown in the leader board --->
 <div ng-if="!leaderTable"> Loading Leaderboard... </div>
 <div ng-show="leaderTable">
 	<table>
-		<th> Player </th>
-		<th> Total Rounds Played </th>
-		<th> Started Human </th>
-		<th> Total Human Kills </th>
-		<th> Total Human Deaths </th>
-		<th> Avg Human lifespan </th>
-		<th> Started Alien </th>
-		<th> Total Alien Kills </th>
-		<th> Total Alien Deaths </th>
-		<th> Avg Alien lifespan </th>
-		<tr ng-repeat="x in leaderTable">
-			<td>{{ x[0] }}</td>
-			<td>{{ x[1].played }}</td>
-			<td>{{ x[1].lifetimeHumanStats.roundsStarted}} </td>
-			<td>{{ x[1].lifetimeHumanStats.kills }}</td>
-			<td>{{ x[1].lifetimeHumanStats.deaths }}</td>
-			<td>{{ x[1].lifetimeHumanStats.totLifetime / x[1].lifetimeHumanStats.lives }} </td>
-			<td>{{ x[1].lifetimeAlienStats.roundsStarted}} </td>
-			<td>{{ x[1].lifetimeAlienStats.kills }}</td>
-			<td>{{ x[1].lifetimeAlienStats.deaths }}</td>
-			<td>{{ x[1].lifetimeAlienStats.totLifetime / x[1].lifetimeAlienStats.lives }} </td>
-		</tr>
+		<th> As Human </th>
+		<td>
+			<table>
+				<th> Player </th>
+				<th> Total Rounds Played </th>
+				<th> Rounds Started</th>
+				<th> Total Kills </th>
+				<th> Total Deaths </th>
+				<th> Avg Lifespan </th>
+				<th> Avg Kills Per Round </th>
+				<th> Avg Deaths Per Round </th>
+				<th> K/D </th>
+				<tr ng-repeat="x in leaderTable[0]">
+					<td>{{ x[0] }}</td>
+					<td>{{ x[1].played }}</td>
+					<td>{{ x[1].lifetimeHumanStats.roundsStarted}} </td>
+					<td>{{ x[1].lifetimeHumanStats.kills }}</td>
+					<td>{{ x[1].lifetimeHumanStats.deaths }}</td>
+					<td>{{ x[1].lifetimeHumanStats.totLifetime / x[1].lifetimeHumanStats.lives }} </td>
+					<td>{{ x[1].lifetimeHumanStats.kills / x[1].lifetimeHumanStats.roundsStarted }} </td>
+					<td>{{ x[1].lifetimeHumanStats.deaths / x[1].lifetimeHumanStats.roundsStarted }} </td>
+					<td>{{ x[1].lifetimeHumanStats.kills / x[1].lifetimeHumanStats.deaths }} </td>
+				</tr>
+			</table>
+		</td>
+		<th> As Alien </th>
+		<td>
+			<table>
+				<th> Player </th>
+				<th> Total Rounds Played </th>
+				<th> Rounds Started</th>
+				<th> Total Kills </th>
+				<th> Total Deaths </th>
+				<th> Avg Lifespan </th>
+				<th> Avg Kills Per Round </th>
+				<th> Avg Deaths Per Round </th>
+				<th> K/D </th>
+				<tr ng-repeat="x in leaderTable[1]">
+					<td>{{ x[0] }}</td>
+					<td>{{ x[1].played }}</td>
+					<td>{{ x[1].lifetimeAlienStats.roundsStarted}} </td>
+					<td>{{ x[1].lifetimeAlienStats.kills }}</td>
+					<td>{{ x[1].lifetimeAlienStats.deaths }}</td>
+					<td>{{ x[1].lifetimeAlienStats.totLifetime / x[1].lifetimeAlienStats.lives }} </td>
+					<td>{{ x[1].lifetimeAlienStats.kills / x[1].lifetimeAlienStats.roundsStarted }} </td>
+					<td>{{ x[1].lifetimeAlienStats.deaths / x[1].lifetimeAlienStats.roundsStarted }} </td>
+					<td>{{ x[1].lifetimeAlienStats.kills / x[1].lifetimeAlienStats.deaths }} </td>
+			</tr>
+			</table>
+		</td>
 	</table>
 </div>
